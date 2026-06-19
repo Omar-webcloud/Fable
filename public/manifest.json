@@ -1,0 +1,9 @@
+{
+  "short_name": "Fable",
+  "name": "Fable - Ebook Sharing Platform",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#6D28D9",
+  "background_color": "#F8FAFC"
+}
