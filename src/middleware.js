@@ -5,7 +5,8 @@ const authRoutes = ["/login", "/register"];
 
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get("fable_token")?.value;
+  const token = request.cookies.get("better-auth.session_token")?.value ||
+                request.cookies.get("__Secure-better-auth.session_token")?.value;
 
   const isProtected = protectedRoutes.some((route) =>
     pathname.startsWith(route)

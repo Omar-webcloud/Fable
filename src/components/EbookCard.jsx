@@ -16,13 +16,16 @@ export default function EbookCard({ ebook, index = 0, purchased = false }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.05 }}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-20px" }}
+      transition={{ duration: 0.5, delay: (index % 3) * 0.1, ease: "easeOut" }}
+      whileHover={{ y: -6, scale: 1.02 }}
+      className="h-full"
     >
-      <Link href={`/ebooks/${ebook._id}`} className="group block">
-        <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-          <div className="relative h-52 overflow-hidden bg-gradient-to-br from-purple-50 to-violet-100 dark:from-slate-800 dark:to-slate-950">
+      <Link href={`/ebooks/${ebook._id}`} className="group block h-full">
+        <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-shadow duration-300 hover:shadow-lg h-full flex flex-col">
+          <div className="relative h-52 overflow-hidden bg-gradient-to-br from-purple-50 to-violet-100 dark:from-slate-800 dark:to-slate-950 shrink-0">
             {/* Wishlist Heart Toggle */}
             <button
               type="button"
@@ -55,11 +58,13 @@ export default function EbookCard({ ebook, index = 0, purchased = false }) {
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
           </div>
-          <div className="p-4">
-            <h3 className="line-clamp-1 font-semibold text-dark dark:text-white transition-colors group-hover:text-primary dark:group-hover:text-purple-400">
-              {ebook.title}
-            </h3>
-            <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">{ebook.writerName}</p>
+          <div className="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 className="line-clamp-1 font-semibold text-dark dark:text-white transition-colors group-hover:text-primary dark:group-hover:text-purple-400">
+                {ebook.title}
+              </h3>
+              <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">{ebook.writerName}</p>
+            </div>
             <div className="mt-3 flex items-center justify-between">
               <span className="text-lg font-bold text-primary dark:text-purple-400">
                 {formatPrice(ebook.price)}

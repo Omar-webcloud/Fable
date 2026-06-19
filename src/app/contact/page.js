@@ -27,18 +27,18 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-12">
+    <div className="min-h-screen bg-background dark:bg-slate-950 py-12 transition-colors duration-200">
       <div className="mx-auto max-w-5xl px-4">
         {/* Header */}
         <div className="mb-12 text-center">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl font-extrabold text-dark sm:text-5xl"
+            className="text-4xl font-extrabold text-dark dark:text-slate-100 sm:text-5xl"
           >
             Get in <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Touch</span>
           </motion.h1>
-          <p className="mt-3 text-lg text-gray-500">
+          <p className="mt-3 text-lg text-gray-500 dark:text-slate-400">
             Have questions, feedback, or need help? We&apos;d love to hear from you.
           </p>
         </div>
@@ -51,8 +51,8 @@ export default function ContactPage() {
             transition={{ delay: 0.1 }}
             className="md:col-span-2 space-y-6"
           >
-            <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
-              <h3 className="text-xl font-bold text-dark mb-4">Contact Information</h3>
+            <div className="rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm border border-gray-100 dark:border-slate-800 transition-colors">
+              <h3 className="text-xl font-bold text-dark dark:text-slate-100 mb-4">Contact Information</h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -61,9 +61,22 @@ export default function ContactPage() {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-dark">Email Support</h4>
-                    <p className="text-sm text-gray-500">support@fable.com</p>
-                    <p className="text-xs text-gray-400">Response time: within 24 hours</p>
+                    <h4 className="font-semibold text-dark dark:text-slate-200">Email Support</h4>
+                    <p className="text-sm text-gray-500 dark:text-slate-400">support@fable.com</p>
+                    <p className="text-xs text-gray-400 dark:text-slate-500">Response time: within 24 hours</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-dark dark:text-slate-200">Phone Support</h4>
+                    <p className="text-sm text-gray-500 dark:text-slate-400">+880 2-9113420</p>
+                    <p className="text-sm text-gray-500 dark:text-slate-400">+880 1711-223344</p>
                   </div>
                 </div>
 
@@ -75,20 +88,22 @@ export default function ContactPage() {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-dark">Office Location</h4>
-                    <p className="text-sm text-gray-500">100 Digital Publishing Lane</p>
-                    <p className="text-sm text-gray-500">San Francisco, CA 94103</p>
+                    <h4 className="font-semibold text-dark dark:text-slate-200">Office Location</h4>
+                    <p className="text-sm text-gray-500 dark:text-slate-400">Fable Towers, Floor 14</p>
+                    <p className="text-sm text-gray-500 dark:text-slate-400">42 Kazi Nazrul Islam Avenue</p>
+                    <p className="text-sm text-gray-500 dark:text-slate-400">Karwan Bazar, Dhaka - 1215</p>
+                    <p className="text-sm text-gray-500 dark:text-slate-400 font-medium">Bangladesh</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
-              <h3 className="text-lg font-bold text-dark mb-2">Frequently Asked Questions</h3>
-              <p className="text-sm text-gray-500 mb-3">
+            <div className="rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm border border-gray-100 dark:border-slate-800 transition-colors">
+              <h3 className="text-lg font-bold text-dark dark:text-slate-100 mb-2">Frequently Asked Questions</h3>
+              <p className="text-sm text-gray-500 dark:text-slate-400 mb-3">
                 Looking for quick answers? Check out our help center or reader guidelines.
               </p>
-              <a href="#" className="inline-block text-sm font-semibold text-primary hover:underline">
+              <a href="#" className="inline-block text-sm font-semibold text-primary dark:text-secondary hover:underline">
                 Visit Help Center &rarr;
               </a>
             </div>
@@ -99,52 +114,52 @@ export default function ContactPage() {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="md:col-span-3 rounded-2xl bg-white p-8 shadow-sm border border-gray-100"
+            className="md:col-span-3 rounded-2xl bg-white dark:bg-slate-900 p-8 shadow-sm border border-gray-100 dark:border-slate-800 transition-colors"
           >
-            <h3 className="text-2xl font-bold text-dark mb-6">Send us a message</h3>
+            <h3 className="text-2xl font-bold text-dark dark:text-slate-100 mb-6">Send us a message</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">Full Name</label>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Full Name</label>
                   <input
                     type="text"
                     required
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-dark"
+                    className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40 transition-all text-dark dark:text-slate-100"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">Email Address</label>
+                  <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Email Address</label>
                   <input
                     type="email"
                     required
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-dark"
+                    className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40 transition-all text-dark dark:text-slate-100"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Subject</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Subject</label>
                 <input
                   type="text"
                   required
                   value={form.subject}
                   onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-dark"
+                  className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40 transition-all text-dark dark:text-slate-100"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Message</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Message</label>
                 <textarea
                   rows={5}
                   required
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-dark"
+                  className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40 transition-all text-dark dark:text-slate-100"
                 />
               </div>
 

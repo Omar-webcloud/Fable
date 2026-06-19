@@ -6,7 +6,9 @@ export default function Footer() {
     <footer className="mt-auto border-t border-gray-200 bg-dark text-white">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-4">
         <div>
-          <h3 className="mb-4 text-xl font-bold text-secondary">Fable</h3>
+          <div className="mb-4 flex items-center gap-2">
+            <img src="/logo.png" alt="Fable Logo" className="h-8 w-auto object-contain brightness-110" />
+          </div>
           <p className="text-sm text-gray-400">
             Discover and read original ebooks from talented writers around the world.
           </p>
