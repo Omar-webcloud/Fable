@@ -84,7 +84,7 @@ export default function PrivacyPage() {
             <div className="rounded-xl bg-purple-50 p-6 text-sm text-primary">
               <h3 className="font-bold mb-2">Updates to this Policy</h3>
               <p>
-                We may update this privacy notice from time to time. The updated version will be indicated by an updated "Revised" date and the updated version will be effective as soon as it is accessible.
+                We may update this privacy notice from time to time. The updated version will be indicated by an updated &quot;Revised&quot; date and the updated version will be effective as soon as it is accessible.
               </p>
             </div>
           </div>

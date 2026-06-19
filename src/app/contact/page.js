@@ -39,7 +39,7 @@ export default function ContactPage() {
             Get in <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Touch</span>
           </motion.h1>
           <p className="mt-3 text-lg text-gray-500">
-            Have questions, feedback, or need help? We'd love to hear from you.
+            Have questions, feedback, or need help? We&apos;d love to hear from you.
           </p>
         </div>
 
