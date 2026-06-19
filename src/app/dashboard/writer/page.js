@@ -26,6 +26,12 @@ function WriterDashboardContent() {
   const { user, isPending } = useAuth();
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "overview");
 
+  // Keep state in sync with URL search params (desktop sidebar clicks)
+  useEffect(() => {
+    const tab = searchParams.get("tab") || "overview";
+    setActiveTab(tab);
+  }, [searchParams]);
+
   const [ebooks, setEbooks] = useState([]);
   const [sales, setSales] = useState([]);
   const [bookmarks, setBookmarks] = useState([]);
@@ -103,7 +109,10 @@ function WriterDashboardContent() {
       {/* Tab Navigation (mobile) */}
       <div className="mb-6 flex gap-2 overflow-x-auto lg:hidden">
         {tabs.map((tab) => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+          <button key={tab.key} onClick={() => {
+            setActiveTab(tab.key);
+            router.push(`?tab=${tab.key}`, { scroll: false });
+          }}
             className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition ${activeTab === tab.key ? "bg-primary text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
           >{tab.label}</button>
         ))}

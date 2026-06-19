@@ -8,6 +8,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { adminService, analyticsService, ebookService, userService } from "@/services";
 import { MonthlySalesChart, GenreDistributionChart } from "@/components/Charts";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import SkeletonLoader, { TableRowSkeleton } from "@/components/SkeletonLoader";
 import { formatPrice, formatDate } from "@/utils";
 import { ROLES } from "@/constants";
 
@@ -24,13 +25,22 @@ function AdminDashboardContent() {
   const { user, isPending } = useAuth();
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "overview");
 
+  // Keep state in sync with URL search params (desktop sidebar clicks)
+  useEffect(() => {
+    const tab = searchParams.get("tab") || "overview";
+    setActiveTab(tab);
+  }, [searchParams]);
+
   const [stats, setStats] = useState(null);
   const [monthlySales, setMonthlySales] = useState([]);
   const [genreData, setGenreData] = useState([]);
   const [users, setUsers] = useState([]);
   const [ebooks, setEbooks] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingOverview, setLoadingOverview] = useState(true);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [loadingEbooks, setLoadingEbooks] = useState(true);
+  const [loadingTransactions, setLoadingTransactions] = useState(true);
 
   useEffect(() => {
     if (!isPending) {
@@ -45,24 +55,37 @@ function AdminDashboardContent() {
   useEffect(() => {
     if (!user || user.role !== "admin") return;
 
-    setLoading(true);
+    setLoadingOverview(true);
+    setLoadingUsers(true);
+    setLoadingEbooks(true);
+    setLoadingTransactions(true);
+
     Promise.all([
       adminService.getStats().catch(() => ({ data: null })),
       analyticsService.getMonthlySales().catch(() => ({ data: [] })),
       analyticsService.getGenreDistribution().catch(() => ({ data: [] })),
-      adminService.getTransactions().catch(() => ({ data: [] })),
     ])
-      .then(([statsRes, monthlyRes, genreRes, txRes]) => {
+      .then(([statsRes, monthlyRes, genreRes]) => {
         setStats(statsRes.data);
         setMonthlySales(monthlyRes.data || []);
         setGenreData((genreRes.data || []).map((g) => ({ name: g.genre, value: g.count })));
-        setTransactions(txRes.data || []);
       })
-      .finally(() => setLoading(false));
+      .finally(() => setLoadingOverview(false));
 
-    // Fetch separately (admin-specific)
-    adminService.getEbooks().then((res) => setEbooks(res.data || [])).catch(() => {});
-    userService.getAll().then((res) => setUsers(res.data || [])).catch(() => {});
+    adminService.getTransactions()
+      .then((res) => setTransactions(res.data || []))
+      .catch(() => {})
+      .finally(() => setLoadingTransactions(false));
+
+    adminService.getEbooks()
+      .then((res) => setEbooks(res.data || []))
+      .catch(() => {})
+      .finally(() => setLoadingEbooks(false));
+
+    userService.getAll()
+      .then((res) => setUsers(res.data || []))
+      .catch(() => {})
+      .finally(() => setLoadingUsers(false));
   }, [user]);
 
   const handleRoleChange = async (userId, newRole) => {
@@ -120,7 +143,10 @@ function AdminDashboardContent() {
       {/* Tab Navigation (mobile) */}
       <div className="mb-6 flex gap-2 overflow-x-auto lg:hidden">
         {tabs.map((tab) => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+          <button key={tab.key} onClick={() => {
+            setActiveTab(tab.key);
+            router.push(`?tab=${tab.key}`, { scroll: false });
+          }}
             className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition ${activeTab === tab.key ? "bg-primary text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
           >{tab.label}</button>
         ))}
@@ -132,10 +158,10 @@ function AdminDashboardContent() {
           {/* Stats Cards */}
           <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              { label: "Total Users", value: stats?.totalUsers ?? 0, color: "text-primary", bg: "bg-purple-50" },
-              { label: "Total Writers", value: stats?.totalWriters ?? 0, color: "text-secondary", bg: "bg-violet-50" },
-              { label: "Ebooks Sold", value: stats?.totalEbooksSold ?? 0, color: "text-accent", bg: "bg-amber-50" },
-              { label: "Revenue", value: formatPrice(stats?.totalRevenue ?? 0), color: "text-green-600", bg: "bg-green-50" },
+              { label: "Total Users", value: stats?.totalUsers, color: "text-primary", bg: "bg-purple-50" },
+              { label: "Total Writers", value: stats?.totalWriters, color: "text-secondary", bg: "bg-violet-50" },
+              { label: "Ebooks Sold", value: stats?.totalEbooksSold, color: "text-accent", bg: "bg-amber-50" },
+              { label: "Revenue", value: stats !== null ? formatPrice(stats?.totalRevenue ?? 0) : null, color: "text-green-600", bg: "bg-green-50" },
             ].map((card, i) => (
               <motion.div
                 key={card.label}
@@ -145,7 +171,11 @@ function AdminDashboardContent() {
                 className={`rounded-xl ${card.bg} p-5`}
               >
                 <p className="text-sm font-medium text-gray-600">{card.label}</p>
-                <p className={`mt-1 text-3xl font-bold ${card.color}`}>{card.value}</p>
+                {loadingOverview ? (
+                  <SkeletonLoader className="mt-2 h-8 w-24" />
+                ) : (
+                  <p className={`mt-1 text-3xl font-bold ${card.color}`}>{card.value ?? 0}</p>
+                )}
               </motion.div>
             ))}
           </div>
@@ -154,7 +184,18 @@ function AdminDashboardContent() {
           <div className="grid gap-6 xl:grid-cols-2">
             <div className="rounded-xl bg-white p-6 shadow-sm">
               <h3 className="mb-4 text-lg font-semibold text-dark">Monthly Sales</h3>
-              {monthlySales.length > 0 ? (
+              {loadingOverview ? (
+                <div className="flex h-64 flex-col justify-end gap-2 pb-4">
+                  <div className="flex items-end gap-4 h-full px-4">
+                    <SkeletonLoader className="h-1/3 w-full" />
+                    <SkeletonLoader className="h-2/3 w-full" />
+                    <SkeletonLoader className="h-1/2 w-full" />
+                    <SkeletonLoader className="h-3/4 w-full" />
+                    <SkeletonLoader className="h-full w-full" />
+                    <SkeletonLoader className="h-1/4 w-full" />
+                  </div>
+                </div>
+              ) : monthlySales.length > 0 ? (
                 <MonthlySalesChart data={monthlySales} />
               ) : (
                 <div className="flex h-64 items-center justify-center text-gray-400">No sales data yet</div>
@@ -162,7 +203,11 @@ function AdminDashboardContent() {
             </div>
             <div className="rounded-xl bg-white p-6 shadow-sm">
               <h3 className="mb-4 text-lg font-semibold text-dark">Genre Distribution</h3>
-              {genreData.length > 0 ? (
+              {loadingOverview ? (
+                <div className="flex h-64 items-center justify-center">
+                  <SkeletonLoader className="h-48 w-48 rounded-full" />
+                </div>
+              ) : genreData.length > 0 ? (
                 <GenreDistributionChart data={genreData} />
               ) : (
                 <div className="flex h-64 items-center justify-center text-gray-400">No ebook data yet</div>
@@ -186,7 +231,11 @@ function AdminDashboardContent() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {users.length > 0 ? users.map((u) => (
+                {loadingUsers ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRowSkeleton key={i} cols={4} />
+                  ))
+                ) : users.length > 0 ? users.map((u) => (
                   <tr key={u._id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 font-medium text-dark">{u.name}</td>
                     <td className="px-4 py-3 text-gray-500">{u.email}</td>
@@ -225,7 +274,11 @@ function AdminDashboardContent() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {ebooks.length > 0 ? ebooks.map((eb) => (
+                {loadingEbooks ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRowSkeleton key={i} cols={5} />
+                  ))
+                ) : ebooks.length > 0 ? ebooks.map((eb) => (
                   <tr key={eb._id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 font-medium text-dark">{eb.title}</td>
                     <td className="px-4 py-3 text-gray-500">{eb.writerName}</td>
@@ -270,7 +323,11 @@ function AdminDashboardContent() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {transactions.length > 0 ? transactions.map((tx) => (
+                {loadingTransactions ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRowSkeleton key={i} cols={5} />
+                  ))
+                ) : transactions.length > 0 ? transactions.map((tx) => (
                   <tr key={tx._id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 font-mono text-xs text-gray-500">{tx._id}</td>
                     <td className="px-4 py-3">

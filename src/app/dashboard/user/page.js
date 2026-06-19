@@ -23,6 +23,12 @@ function UserDashboardContent() {
   const router = useRouter();
   const { user, isPending } = useAuth();
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "overview");
+
+  // Keep state in sync with URL search params (desktop sidebar clicks)
+  useEffect(() => {
+    const tab = searchParams.get("tab") || "overview";
+    setActiveTab(tab);
+  }, [searchParams]);
   const [purchases, setPurchases] = useState([]);
   const [bookmarks, setBookmarks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -56,7 +62,10 @@ function UserDashboardContent() {
         {tabs.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => {
+              setActiveTab(tab.key);
+              router.push(`?tab=${tab.key}`, { scroll: false });
+            }}
             className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition ${
               activeTab === tab.key ? "bg-primary text-white" : "bg-white text-gray-600 hover:bg-gray-50"
             }`}
