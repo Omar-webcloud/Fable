@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { signUp } from "@/lib/auth-client";
 import { toast } from "react-toastify";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { authService } from "@/services";
 import { ROLES } from "@/constants";
 
 export default function RegisterPage() {
@@ -26,27 +26,24 @@ export default function RegisterPage() {
       toast.error("Passwords do not match");
       return;
     }
+    if (form.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
 
     setLoading(true);
 
     try {
-      const result = await signUp.email({
+      await authService.register({
+        name: form.fullName,
         email: form.email,
         password: form.password,
-        name: form.fullName,
         role: form.role,
-        fullName: form.fullName,
       });
-
-      if (result.error) {
-        toast.error(result.error.message);
-        return;
-      }
-
-      toast.success("Account created successfully");
+      toast.success("Account created successfully! Please login.");
       router.push("/login");
-    } catch {
-      toast.error("Registration failed");
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -105,7 +102,7 @@ export default function RegisterPage() {
               onChange={(e) => setForm({ ...form, role: e.target.value })}
               className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             >
-              <option value={ROLES.USER}>User</option>
+              <option value={ROLES.USER}>Reader</option>
               <option value={ROLES.WRITER}>Writer</option>
             </select>
           </div>
