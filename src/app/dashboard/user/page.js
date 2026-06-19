@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
@@ -8,6 +8,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { purchaseService, bookmarkService } from "@/services";
 import EbookCard from "@/components/EbookCard";
 import { EbookCardSkeleton } from "@/components/SkeletonLoader";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { formatPrice, formatDate, getInitials } from "@/utils";
 
 const tabs = [
@@ -17,7 +18,7 @@ const tabs = [
   { key: "bookmarks", label: "Bookmarks" },
 ];
 
-export default function UserDashboard() {
+function UserDashboardContent() {
   const searchParams = useSearchParams();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "overview");
@@ -184,5 +185,17 @@ export default function UserDashboard() {
         </motion.div>
       )}
     </div>
+  );
+}
+
+export default function UserDashboard() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    }>
+      <UserDashboardContent />
+    </Suspense>
   );
 }

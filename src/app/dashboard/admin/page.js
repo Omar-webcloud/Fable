@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { adminService, analyticsService, ebookService, userService } from "@/services";
 import { MonthlySalesChart, GenreDistributionChart } from "@/components/Charts";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { formatPrice, formatDate } from "@/utils";
 import { ROLES } from "@/constants";
 
@@ -16,7 +17,7 @@ const tabs = [
   { key: "transactions", label: "Transactions" },
 ];
 
-export default function AdminDashboard() {
+function AdminDashboardContent() {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "overview");
 
@@ -275,5 +276,17 @@ export default function AdminDashboard() {
         </motion.div>
       )}
     </div>
+  );
+}
+
+export default function AdminDashboard() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    }>
+      <AdminDashboardContent />
+    </Suspense>
   );
 }

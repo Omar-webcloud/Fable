@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import EbookCard from "@/components/EbookCard";
-import { EbookCardSkeleton } from "@/components/SkeletonLoader";
+import { EbookCardSkeleton, SkeletonLoader } from "@/components/SkeletonLoader";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { ebookService } from "@/services";
 import { GENRES, SORT_OPTIONS } from "@/constants";
 import { useDebounce } from "@/hooks";
 
-export default function BrowsePage() {
+function BrowseContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -181,5 +182,17 @@ export default function BrowsePage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function BrowsePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    }>
+      <BrowseContent />
+    </Suspense>
   );
 }

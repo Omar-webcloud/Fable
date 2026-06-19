@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
@@ -9,7 +9,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Link from "next/link";
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { refreshUser } = useAuth();
@@ -117,5 +117,18 @@ export default function PaymentSuccessPage() {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
+        <LoadingSpinner size="lg" />
+        <p className="text-gray-500">Loading payment status...</p>
+      </div>
+    }>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { Suspense, useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
@@ -9,6 +9,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { ebookService, writerService, bookmarkService } from "@/services";
 import EbookCard from "@/components/EbookCard";
 import { EbookCardSkeleton } from "@/components/SkeletonLoader";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { formatPrice, formatDate } from "@/utils";
 import api from "@/lib/axios";
 
@@ -19,7 +20,7 @@ const tabs = [
   { key: "bookmarks", label: "Bookmarks" },
 ];
 
-export default function WriterDashboard() {
+function WriterDashboardContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useAuth();
@@ -235,5 +236,17 @@ export default function WriterDashboard() {
         </motion.div>
       )}
     </div>
+  );
+}
+
+export default function WriterDashboard() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    }>
+      <WriterDashboardContent />
+    </Suspense>
   );
 }
