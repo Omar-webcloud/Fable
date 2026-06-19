@@ -1,13 +1,22 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import { useAuth } from "@/providers/AuthProvider";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function DashboardLayout({ children }) {
   const { user, isPending } = useAuth();
+  const router = useRouter();
 
-  if (isPending) {
+  useEffect(() => {
+    if (!isPending && !user) {
+      router.push("/login");
+    }
+  }, [user, isPending, router]);
+
+  if (isPending || !user) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <LoadingSpinner size="lg" />

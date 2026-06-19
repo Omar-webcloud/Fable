@@ -7,11 +7,14 @@ import { toast } from "react-toastify";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useAuth } from "@/providers/AuthProvider";
 import { authService } from "@/services";
+import { cn } from "@/utils";
+import { ROLES } from "@/constants";
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [roleToggle, setRoleToggle] = useState(ROLES.USER);
   const [form, setForm] = useState({ email: "", password: "" });
 
   const handleGoogleCredential = useCallback(async (response) => {
@@ -19,6 +22,14 @@ export default function LoginPage() {
     try {
       const res = await authService.googleLogin(response.credential);
       const { user, token } = res.data;
+
+      // Validate role
+      if (roleToggle === ROLES.WRITER && user.role !== "writer" && user.role !== "admin") {
+        toast.error("This account is not registered as a Writer.");
+        setLoading(false);
+        return;
+      }
+
       login(user, token);
       toast.success("Logged in with Google successfully!");
       router.push("/");
@@ -27,7 +38,7 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
-  }, [login, router]);
+  }, [login, router, roleToggle]);
 
   useEffect(() => {
     const initGoogle = () => {
@@ -75,6 +86,14 @@ export default function LoginPage() {
         password: form.password,
       });
       const { user, token } = res.data;
+
+      // Validate role
+      if (roleToggle === ROLES.WRITER && user.role !== "writer" && user.role !== "admin") {
+        toast.error("This account is not registered as a Writer.");
+        setLoading(false);
+        return;
+      }
+
       login(user, token);
       toast.success("Logged in successfully!");
       router.push("/");
@@ -89,6 +108,34 @@ export default function LoginPage() {
     <div className="flex min-h-[70vh] items-center justify-center px-4 py-12">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
         <h1 className="mb-6 text-center text-3xl font-bold text-dark">Login</h1>
+
+        {/* Role Toggle */}
+        <div className="mb-6 flex rounded-lg bg-gray-100 p-1">
+          <button
+            type="button"
+            onClick={() => setRoleToggle(ROLES.USER)}
+            className={cn(
+              "flex-1 rounded-md py-2 text-center text-sm font-semibold transition-all",
+              roleToggle === ROLES.USER
+                ? "bg-white text-primary shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
+            )}
+          >
+            Reader
+          </button>
+          <button
+            type="button"
+            onClick={() => setRoleToggle(ROLES.WRITER)}
+            className={cn(
+              "flex-1 rounded-md py-2 text-center text-sm font-semibold transition-all",
+              roleToggle === ROLES.WRITER
+                ? "bg-white text-primary shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
+            )}
+          >
+            Writer
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

@@ -1,9 +1,10 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import { useAuth } from "@/providers/AuthProvider";
 import { adminService, analyticsService, ebookService, userService } from "@/services";
 import { MonthlySalesChart, GenreDistributionChart } from "@/components/Charts";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -19,6 +20,8 @@ const tabs = [
 
 function AdminDashboardContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const { user, isPending } = useAuth();
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "overview");
 
   const [stats, setStats] = useState(null);
@@ -30,6 +33,18 @@ function AdminDashboardContent() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!isPending) {
+      if (!user) {
+        router.push("/login");
+      } else if (user.role !== "admin") {
+        router.push("/dashboard");
+      }
+    }
+  }, [user, isPending, router]);
+
+  useEffect(() => {
+    if (!user || user.role !== "admin") return;
+
     setLoading(true);
     Promise.all([
       adminService.getStats().catch(() => ({ data: null })),
@@ -48,7 +63,7 @@ function AdminDashboardContent() {
     // Fetch separately (admin-specific)
     adminService.getEbooks().then((res) => setEbooks(res.data || [])).catch(() => {});
     userService.getAll().then((res) => setUsers(res.data || [])).catch(() => {});
-  }, []);
+  }, [user]);
 
   const handleRoleChange = async (userId, newRole) => {
     try {

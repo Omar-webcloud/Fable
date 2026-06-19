@@ -23,7 +23,7 @@ const tabs = [
 function WriterDashboardContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isPending } = useAuth();
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "overview");
 
   const [ebooks, setEbooks] = useState([]);
@@ -33,6 +33,18 @@ function WriterDashboardContent() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!isPending) {
+      if (!user) {
+        router.push("/login");
+      } else if (user.role !== "writer" && user.role !== "admin") {
+        router.push("/dashboard");
+      }
+    }
+  }, [user, isPending, router]);
+
+  useEffect(() => {
+    if (!user || (user.role !== "writer" && user.role !== "admin")) return;
+
     setLoading(true);
     Promise.all([
       api.get("/writer/my-ebooks").catch(() => ({ data: [] })),
@@ -47,7 +59,7 @@ function WriterDashboardContent() {
         setBookmarks(bookmarkRes.data || []);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [user]);
 
   const handlePublishToggle = async (ebookId, currentStatus) => {
     try {

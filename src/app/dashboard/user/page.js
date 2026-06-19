@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { useAuth } from "@/providers/AuthProvider";
@@ -20,13 +20,21 @@ const tabs = [
 
 function UserDashboardContent() {
   const searchParams = useSearchParams();
-  const { user } = useAuth();
+  const router = useRouter();
+  const { user, isPending } = useAuth();
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "overview");
   const [purchases, setPurchases] = useState([]);
   const [bookmarks, setBookmarks] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!isPending && !user) {
+      router.push("/login");
+    }
+  }, [user, isPending, router]);
+
+  useEffect(() => {
+    if (!user) return;
     setLoading(true);
     Promise.all([
       purchaseService.getByUser().catch(() => ({ data: [] })),
@@ -37,7 +45,7 @@ function UserDashboardContent() {
         setBookmarks(bookmarkRes.data || []);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [user]);
 
   return (
     <div>
