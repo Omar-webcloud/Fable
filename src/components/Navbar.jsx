@@ -1,16 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/providers/AuthProvider";
-import { signOut } from "@/lib/auth-client";
+import { cn } from "@/utils";
 
 export default function Navbar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
 
-  const handleLogout = async () => {
-    await signOut();
+  const handleLogout = () => {
+    logout();
+    setMobileOpen(false);
   };
 
   const links = [
@@ -31,7 +34,12 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-gray-700 transition hover:text-primary"
+              className={cn(
+                "font-medium transition hover:text-primary",
+                pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))
+                  ? "text-primary"
+                  : "text-gray-700"
+              )}
             >
               {link.label}
             </Link>
@@ -46,7 +54,10 @@ export default function Navbar() {
           ) : (
             <Link
               href="/login"
-              className="rounded-lg bg-primary px-4 py-2 text-white transition hover:bg-secondary"
+              className={cn(
+                "rounded-lg bg-primary px-4 py-2 text-white transition hover:bg-secondary",
+                pathname === "/login" && "ring-2 ring-primary/30"
+              )}
             >
               Login
             </Link>
@@ -74,18 +85,23 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="block py-2 text-gray-700"
+              className={cn(
+                "block py-2 font-medium",
+                pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))
+                  ? "text-primary"
+                  : "text-gray-700"
+              )}
               onClick={() => setMobileOpen(false)}
             >
               {link.label}
             </Link>
           ))}
           {user ? (
-            <button onClick={handleLogout} className="mt-2 text-primary">
+            <button onClick={handleLogout} className="mt-2 font-medium text-primary">
               Logout
             </button>
           ) : (
-            <Link href="/login" className="mt-2 block text-primary" onClick={() => setMobileOpen(false)}>
+            <Link href="/login" className="mt-2 block font-medium text-primary" onClick={() => setMobileOpen(false)}>
               Login
             </Link>
           )}
