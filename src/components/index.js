@@ -7,3 +7,4 @@ export { default as ErrorBoundary } from "./ErrorBoundary";
 export { MonthlySalesChart, GenreDistributionChart } from "./Charts";
 export { default as EbookCard } from "./EbookCard";
 export { default as DashboardSidebar } from "./DashboardSidebar";
+export { default as ThemeToggle } from "./ThemeToggle";

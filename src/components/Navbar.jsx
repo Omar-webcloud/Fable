@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/providers/AuthProvider";
 import { cn } from "@/utils";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -23,7 +24,7 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/80 backdrop-blur-md">
+    <nav className="sticky top-0 z-50 border-b border-gray-100 dark:border-slate-900 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
         <Link href="/" className="text-2xl font-bold text-primary">
           Fable
@@ -35,15 +36,16 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               className={cn(
-                "font-medium transition hover:text-primary",
+                "font-medium transition hover:text-primary dark:hover:text-primary",
                 pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))
                   ? "text-primary"
-                  : "text-gray-700"
+                  : "text-gray-700 dark:text-slate-300"
               )}
             >
               {link.label}
             </Link>
           ))}
+          <ThemeToggle />
           {user ? (
             <button
               onClick={handleLogout}
@@ -65,7 +67,7 @@ export default function Navbar() {
         </div>
 
         <button
-          className="md:hidden"
+          className="md:hidden text-gray-700 dark:text-slate-200"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label="Toggle menu"
         >
@@ -80,7 +82,7 @@ export default function Navbar() {
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-gray-100 px-4 py-4 md:hidden">
+        <div className="border-t border-gray-100 dark:border-slate-900 bg-white dark:bg-slate-950 px-4 py-4 md:hidden">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -89,22 +91,25 @@ export default function Navbar() {
                 "block py-2 font-medium",
                 pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))
                   ? "text-primary"
-                  : "text-gray-700"
+                  : "text-gray-700 dark:text-slate-300"
               )}
               onClick={() => setMobileOpen(false)}
             >
               {link.label}
             </Link>
           ))}
-          {user ? (
-            <button onClick={handleLogout} className="mt-2 font-medium text-primary">
-              Logout
-            </button>
-          ) : (
-            <Link href="/login" className="mt-2 block font-medium text-primary" onClick={() => setMobileOpen(false)}>
-              Login
-            </Link>
-          )}
+          <div className="mt-4 flex items-center justify-between border-t border-gray-100 dark:border-slate-900 pt-4">
+            {user ? (
+              <button onClick={handleLogout} className="font-medium text-primary hover:text-secondary">
+                Logout
+              </button>
+            ) : (
+              <Link href="/login" className="font-medium text-primary hover:text-secondary" onClick={() => setMobileOpen(false)}>
+                Login
+              </Link>
+            )}
+            <ThemeToggle />
+          </div>
         </div>
       )}
     </nav>

@@ -8,6 +8,7 @@ import { ebookService, paymentService, bookmarkService } from "@/services";
 import { useAuth } from "@/providers/AuthProvider";
 import { formatPrice, formatDate } from "@/utils";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { useWishlist } from "@/providers/WishlistProvider";
 
 export default function EbookDetailsPage() {
   const { id } = useParams();
@@ -17,8 +18,9 @@ export default function EbookDetailsPage() {
   const [ebook, setEbook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
-  const [bookmarked, setBookmarked] = useState(false);
   const [purchased, setPurchased] = useState(false);
+  const { isWishlisted, toggleWishlist } = useWishlist();
+  const bookmarked = isWishlisted(id);
 
   useEffect(() => {
     if (!id) return;
@@ -40,15 +42,7 @@ export default function EbookDetailsPage() {
       .finally(() => setLoading(false));
   }, [id, user]);
 
-  useEffect(() => {
-    if (!user || !id) return;
-    bookmarkService.getAll()
-      .then((res) => {
-        const bookmarks = res.data || [];
-        setBookmarked(bookmarks.some((b) => (b.ebookId?._id || b.ebookId) === id));
-      })
-      .catch(() => {});
-  }, [user, id]);
+  // Bookmarks are synced globally via useWishlist hook
 
   const handlePurchase = async () => {
     if (!user) {
@@ -70,24 +64,8 @@ export default function EbookDetailsPage() {
     }
   };
 
-  const toggleBookmark = async () => {
-    if (!user) {
-      toast.info("Please login to bookmark");
-      return;
-    }
-    try {
-      if (bookmarked) {
-        await bookmarkService.remove(id);
-        setBookmarked(false);
-        toast.success("Bookmark removed");
-      } else {
-        await bookmarkService.add(id);
-        setBookmarked(true);
-        toast.success("Ebook bookmarked!");
-      }
-    } catch (err) {
-      toast.error(err.response?.data?.error || "Failed to update bookmark");
-    }
+  const toggleBookmark = () => {
+    toggleWishlist(id);
   };
 
   if (loading) {
@@ -154,44 +132,44 @@ export default function EbookDetailsPage() {
             </span>
           </div>
 
-          <h1 className="mb-2 text-3xl font-bold text-dark">{ebook.title}</h1>
-          <p className="mb-4 text-gray-500">
+          <h1 className="mb-2 text-3xl font-bold text-dark dark:text-white">{ebook.title}</h1>
+          <p className="mb-4 text-gray-500 dark:text-slate-400">
             by <span className="font-medium text-secondary">{ebook.writerName}</span>
           </p>
 
-          <p className="mb-6 text-gray-600 leading-relaxed">{ebook.description}</p>
+          <p className="mb-6 text-gray-600 dark:text-slate-300 leading-relaxed">{ebook.description}</p>
 
-          <div className="mb-6 rounded-xl bg-gray-50 p-4">
+          <div className="mb-6 rounded-xl bg-gray-50 dark:bg-slate-900/50 p-4">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-500">Price</span>
-                <p className="text-2xl font-bold text-primary">{formatPrice(ebook.price)}</p>
+                <span className="text-gray-500 dark:text-slate-400">Price</span>
+                <p className="text-2xl font-bold text-primary dark:text-purple-400">{formatPrice(ebook.price)}</p>
               </div>
               <div>
-                <span className="text-gray-500">Uploaded</span>
-                <p className="font-medium text-dark">{formatDate(ebook.createdAt)}</p>
+                <span className="text-gray-500 dark:text-slate-400">Uploaded</span>
+                <p className="font-medium text-dark dark:text-slate-200">{formatDate(ebook.createdAt)}</p>
               </div>
               <div>
-                <span className="text-gray-500">Total Sales</span>
-                <p className="font-medium text-dark">{ebook.totalSales || 0}</p>
+                <span className="text-gray-500 dark:text-slate-400">Total Sales</span>
+                <p className="font-medium text-dark dark:text-slate-200">{ebook.totalSales || 0}</p>
               </div>
               <div>
-                <span className="text-gray-500">Genre</span>
-                <p className="font-medium text-dark">{ebook.genre}</p>
+                <span className="text-gray-500 dark:text-slate-400">Genre</span>
+                <p className="font-medium text-dark dark:text-slate-200">{ebook.genre}</p>
               </div>
             </div>
           </div>
 
           <div className="flex gap-3">
             {purchased ? (
-              <div className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-green-50 px-6 py-3 font-semibold text-green-600">
+              <div className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-green-50 dark:bg-green-950/30 px-6 py-3 font-semibold text-green-600 dark:text-green-400">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/>
                 </svg>
                 Already Purchased
               </div>
             ) : isOwner ? (
-              <div className="flex-1 rounded-xl bg-gray-100 px-6 py-3 text-center font-semibold text-gray-400">
+              <div className="flex-1 rounded-xl bg-gray-100 dark:bg-slate-800 px-6 py-3 text-center font-semibold text-gray-400 dark:text-slate-500">
                 Your own ebook
               </div>
             ) : (
@@ -206,10 +184,11 @@ export default function EbookDetailsPage() {
 
             <button
               onClick={toggleBookmark}
-              className={`rounded-xl border-2 px-4 py-3 transition ${bookmarked ? "border-primary bg-primary/5 text-primary" : "border-gray-200 text-gray-400 hover:border-primary hover:text-primary"}`}
+              className={`rounded-xl border-2 px-4 py-3 transition ${bookmarked ? "border-primary bg-primary/5 text-primary" : "border-gray-200 dark:border-slate-800 text-gray-400 hover:border-primary hover:text-primary dark:hover:border-primary dark:hover:text-primary"}`}
+              aria-label="Toggle Wishlist"
             >
-              <svg className="h-5 w-5" fill={bookmarked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+              <svg className="h-5 w-5" fill={bookmarked ? "#EF4444" : "none"} stroke={bookmarked ? "#EF4444" : "currentColor"} strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
               </svg>
             </button>
           </div>
@@ -222,10 +201,10 @@ export default function EbookDetailsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-12 rounded-2xl bg-white p-8 shadow-lg"
+          className="mt-12 rounded-2xl bg-white dark:bg-slate-900 p-8 shadow-lg border dark:border-slate-800"
         >
-          <h2 className="mb-4 text-2xl font-bold text-dark">Full Content</h2>
-          <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap">
+          <h2 className="mb-4 text-2xl font-bold text-dark dark:text-white">Full Content</h2>
+          <div className="prose max-w-none text-gray-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
             {ebook.fullContent}
           </div>
         </motion.div>

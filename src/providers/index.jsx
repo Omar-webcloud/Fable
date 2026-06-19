@@ -2,11 +2,17 @@
 
 import ToastProvider from "./ToastProvider";
 import { AuthProvider } from "./AuthProvider";
+import { WishlistProvider } from "./WishlistProvider";
+import { ThemeProvider } from "next-themes";
 
 export default function Providers({ children }) {
   return (
-    <AuthProvider>
-      <ToastProvider>{children}</ToastProvider>
-    </AuthProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <AuthProvider>
+        <WishlistProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </WishlistProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
