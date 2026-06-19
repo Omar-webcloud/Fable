@@ -10,9 +10,9 @@ export const authService = {
 export const userService = {
   getProfile: (id) => api.get(`/users/${id}`),
   updateProfile: (id, data) => api.put(`/users/${id}`, data),
-  getAll: () => api.get("/users"),
-  deleteUser: (id) => api.delete(`/users/${id}`),
-  changeRole: (id, role) => api.patch(`/users/${id}/role`, { role }),
+  getAll: () => api.get("/admin/users"),
+  deleteUser: (id) => api.delete(`/admin/users/${id}`),
+  changeRole: (id, role) => api.patch(`/admin/users/${id}/role`, { role }),
 };
 
 export const ebookService = {

@@ -5,3 +5,5 @@ export { default as LoadingSpinner } from "./LoadingSpinner";
 export { default as SkeletonLoader, EbookCardSkeleton, TableRowSkeleton } from "./SkeletonLoader";
 export { default as ErrorBoundary } from "./ErrorBoundary";
 export { MonthlySalesChart, GenreDistributionChart } from "./Charts";
+export { default as EbookCard } from "./EbookCard";
+export { default as DashboardSidebar } from "./DashboardSidebar";
