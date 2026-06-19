@@ -1,7 +1,7 @@
-# 📚 Fable - Ebook Sharing Platform (Frontend)
+#  Fable - Ebook Sharing Platform 
 
-## 🌍 Live URL
-[Add Vercel URL Here]
+##  Live URL
+https://fable-umber.vercel.app/
 
 ---
 
@@ -593,38 +593,3 @@ NEXT_PUBLIC_APP_URL=
 
 BETTER_AUTH_URL=
 
----
-
-# Color Palette
-
-Primary:
-
-#6D28D9
-
-Secondary:
-
-#A855F7
-
-Accent:
-
-#F59E0B
-
-Background:
-
-#F8FAFC
-
-Dark:
-
-#0F172A
-
----
-
-# Future Features
-
-- Wishlist
-- Dark Mode
-- Reading Progress
-- Writer Profiles
-- Ebook Reviews
-- Ratings
-- Reading Statistics
