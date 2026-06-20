@@ -182,28 +182,6 @@ function AdminDashboardContent() {
 
           {/* Charts */}
           <div className="grid gap-6 xl:grid-cols-2">
-        {/* Responsive chart containers */}
-        <div className="w-full h-64 sm:h-80">
-          {loadingOverview ? (
-            <div className="flex h-64 flex-col justify-end gap-2 pb-4">
-              {/* Skeleton loaders remain */}
-              <div className="flex items-end gap-4 h-full px-4">
-                <SkeletonLoader className="h-1/3 w-full" />
-                <SkeletonLoader className="h-2/3 w-full" />
-                <SkeletonLoader className="h-1/2 w-full" />
-                <SkeletonLoader className="h-3/4 w-full" />
-                <SkeletonLoader className="h-full w-full" />
-                <SkeletonLoader className="h-1/4 w-full" />
-              </div>
-            </div>
-          ) : (
-            <MonthlySalesChart data={monthlySales} />
-          )}
-        </div>
-        <div className="w-full h-64 sm:h-80">
-          {loadingOverview ? (
-            <div className="flex h-64 items-center justify-center">
-              <SkeletonLoader className="h-48 w-48 rounded-full" />
             <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-6 shadow-sm">
               <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Monthly Sales</h3>
               {loadingOverview ? (
@@ -220,7 +198,7 @@ function AdminDashboardContent() {
               ) : monthlySales.length > 0 ? (
                 <MonthlySalesChart data={monthlySales} />
               ) : (
-                <div className="flex h-64 items-center justify-center text-gray-405 dark:text-slate-500">No sales data yet</div>
+                <div className="flex h-64 items-center justify-center text-gray-400 dark:text-slate-500">No sales data yet</div>
               )}
             </div>
             <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-6 shadow-sm">
@@ -232,7 +210,7 @@ function AdminDashboardContent() {
               ) : genreData.length > 0 ? (
                 <GenreDistributionChart data={genreData} />
               ) : (
-                <div className="flex h-64 items-center justify-center text-gray-405 dark:text-slate-500">No ebook data yet</div>
+                <div className="flex h-64 items-center justify-center text-gray-400 dark:text-slate-500">No ebook data yet</div>
               )}
             </div>
           </div>
