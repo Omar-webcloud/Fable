@@ -106,19 +106,19 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-[70vh] items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
-        <h1 className="mb-6 text-center text-3xl font-bold text-dark">Login</h1>
+      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-950 p-8 shadow-lg border dark:border-slate-800">
+        <h1 className="mb-6 text-center text-3xl font-bold text-dark dark:text-white">Login</h1>
 
         {/* Role Toggle */}
-        <div className="mb-6 flex rounded-lg bg-gray-100 p-1">
+        <div className="mb-6 flex rounded-lg bg-gray-100 dark:bg-slate-900 p-1">
           <button
             type="button"
             onClick={() => setRoleToggle(ROLES.USER)}
             className={cn(
               "flex-1 rounded-md py-2 text-center text-sm font-semibold transition-all",
               roleToggle === ROLES.USER
-                ? "bg-white text-primary shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-white dark:bg-slate-950 text-primary shadow-sm"
+                : "text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200"
             )}
           >
             Reader
@@ -129,8 +129,8 @@ export default function LoginPage() {
             className={cn(
               "flex-1 rounded-md py-2 text-center text-sm font-semibold transition-all",
               roleToggle === ROLES.WRITER
-                ? "bg-white text-primary shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-white dark:bg-slate-950 text-primary shadow-sm"
+                : "text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200"
             )}
           >
             Writer
@@ -139,23 +139,23 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Email</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Email</label>
             <input
               type="email"
               required
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white dark:bg-slate-900 text-dark dark:text-slate-100"
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Password</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Password</label>
             <input
               type="password"
               required
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white dark:bg-slate-900 text-dark dark:text-slate-100"
             />
           </div>
           <button
@@ -168,9 +168,9 @@ export default function LoginPage() {
         </form>
 
         <div className="my-6 flex items-center gap-4">
-          <div className="h-px flex-1 bg-gray-200" />
-          <span className="text-sm text-gray-500">or</span>
-          <div className="h-px flex-1 bg-gray-200" />
+          <div className="h-px flex-1 bg-gray-200 dark:bg-slate-800" />
+          <span className="text-sm text-gray-500 dark:text-slate-400">or</span>
+          <div className="h-px flex-1 bg-gray-200 dark:bg-slate-800" />
         </div>
 
         {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
@@ -180,7 +180,7 @@ export default function LoginPage() {
         ) : (
           <button
             onClick={() => toast.info("Google login requires NEXT_PUBLIC_GOOGLE_CLIENT_ID in env")}
-            className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 py-3 font-semibold transition hover:bg-gray-50"
+            className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 dark:border-slate-800 py-3 font-semibold transition hover:bg-gray-50 dark:hover:bg-slate-900 dark:text-slate-200"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -192,9 +192,9 @@ export default function LoginPage() {
           </button>
         )}
 
-        <p className="mt-6 text-center text-sm text-gray-600">
+        <p className="mt-6 text-center text-sm text-gray-600 dark:text-slate-400">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="font-semibold text-primary hover:underline">
+          <Link href="/register" className="font-semibold text-primary dark:text-purple-400 hover:underline">
             Register
           </Link>
         </p>

@@ -65,7 +65,7 @@ function UserDashboardContent() {
               router.push(`?tab=${tab.key}`, { scroll: false });
             }}
             className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition ${
-              activeTab === tab.key ? "bg-primary text-white" : "bg-white text-gray-600 hover:bg-gray-50"
+              activeTab === tab.key ? "bg-primary text-white" : "bg-white dark:bg-slate-950 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-900 border dark:border-slate-800"
             }`}
           >
             {tab.label}
@@ -77,7 +77,7 @@ function UserDashboardContent() {
       {activeTab === "overview" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           {/* Profile Card */}
-          <div className="mb-6 rounded-xl bg-white dark:bg-slate-900 border dark:border-slate-800 shadow-sm p-6">
+          <div className="mb-6 rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 shadow-sm p-6">
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-xl font-bold text-white">
                 {user?.image ? <img src={user.image} alt="" className="h-full w-full rounded-full object-cover" /> : getInitials(user?.name)}
@@ -92,24 +92,24 @@ function UserDashboardContent() {
 
           {/* Stats Cards */}
           <div className="mb-6 grid gap-4 sm:grid-cols-3">
-            <div className="rounded-xl bg-white dark:bg-slate-900 border dark:border-slate-800 p-5 shadow-sm">
+            <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-5 shadow-sm">
               <p className="text-sm text-gray-500 dark:text-slate-400">Total Purchases</p>
               <p className="mt-1 text-3xl font-bold text-primary dark:text-purple-400">{purchases.length}</p>
             </div>
-            <div className="rounded-xl bg-white dark:bg-slate-900 border dark:border-slate-800 p-5 shadow-sm">
+            <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-5 shadow-sm">
               <p className="text-sm text-gray-500 dark:text-slate-400">Amount Spent</p>
               <p className="mt-1 text-3xl font-bold text-secondary dark:text-purple-300">
                 {formatPrice(purchases.reduce((sum, p) => sum + (p.amount || 0), 0))}
               </p>
             </div>
-            <div className="rounded-xl bg-white dark:bg-slate-900 border dark:border-slate-800 p-5 shadow-sm">
+            <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-5 shadow-sm">
               <p className="text-sm text-gray-500 dark:text-slate-400">Wishlist</p>
               <p className="mt-1 text-3xl font-bold text-accent dark:text-amber-400">{wishlist.length}</p>
             </div>
           </div>
 
           {/* Recent Purchases */}
-          <div className="rounded-xl bg-white dark:bg-slate-900 border dark:border-slate-800 p-6 shadow-sm">
+          <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-6 shadow-sm">
             <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Recent Purchases</h3>
             {loading ? (
               <div className="space-y-3">
@@ -118,7 +118,7 @@ function UserDashboardContent() {
             ) : purchases.length > 0 ? (
               <div className="space-y-3">
                 {purchases.slice(0, 5).map((p) => (
-                  <div key={p._id} className="flex items-center justify-between rounded-lg bg-gray-50 dark:bg-slate-850 p-3">
+                  <div key={p._id} className="flex items-center justify-between rounded-lg bg-gray-50 dark:bg-slate-900 border dark:border-slate-800 p-3">
                     <div>
                       <p className="font-medium text-dark dark:text-white">{p.ebookId?.title || "Ebook"}</p>
                       <p className="text-sm text-gray-500 dark:text-slate-400">{formatDate(p.purchaseDate)}</p>
@@ -136,10 +136,10 @@ function UserDashboardContent() {
 
       {/* Purchase History Tab */}
       {activeTab === "purchases" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl bg-white dark:bg-slate-900 border dark:border-slate-800 shadow-sm">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm min-w-[600px]">
-              <thead className="border-b dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
+              <thead className="border-b dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50">
                 <tr>
                   <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Ebook</th>
                   <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Writer</th>

@@ -60,7 +60,7 @@ function BrowseContent() {
       <h1 className="mb-8 text-3xl font-bold text-dark dark:text-white">Browse Ebooks</h1>
 
       {/* Filters */}
-      <div className="mb-8 rounded-xl bg-white dark:bg-slate-900 border dark:border-slate-800 p-4 shadow-sm">
+      <div className="mb-8 rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-4 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row">
           <div className="relative flex-1">
             <svg className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,13 +71,13 @@ function BrowseContent() {
               placeholder="Search by title or writer..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-slate-800 py-2 pl-10 pr-4 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white dark:bg-slate-950 text-dark dark:text-white"
+              className="w-full rounded-lg border border-gray-300 dark:border-slate-800 py-2 pl-10 pr-4 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white dark:bg-slate-900 text-dark dark:text-white"
             />
           </div>
           <select
             value={genre}
             onChange={(e) => setGenre(e.target.value)}
-            className="rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary bg-white dark:bg-slate-950 text-dark dark:text-white"
+            className="rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary bg-white dark:bg-slate-900 text-dark dark:text-white"
           >
             <option value="">All Genres</option>
             {GENRES.map((g) => (
@@ -87,7 +87,7 @@ function BrowseContent() {
           <select
             value={availability}
             onChange={(e) => setAvailability(e.target.value)}
-            className="rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary bg-white dark:bg-slate-950 text-dark dark:text-white"
+            className="rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary bg-white dark:bg-slate-900 text-dark dark:text-white"
           >
             <option value="">All Availability</option>
             <option value="in_stock">In Stock</option>
@@ -96,7 +96,7 @@ function BrowseContent() {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
-            className="rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary bg-white dark:bg-slate-950 text-dark dark:text-white"
+            className="rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary bg-white dark:bg-slate-900 text-dark dark:text-white"
           >
             {SORT_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -110,7 +110,7 @@ function BrowseContent() {
             placeholder="Min"
             value={minPrice}
             onChange={(e) => setMinPrice(e.target.value)}
-            className="w-24 rounded-lg border border-gray-300 dark:border-slate-800 px-3 py-1.5 text-sm outline-none focus:border-primary bg-white dark:bg-slate-950 text-dark dark:text-white"
+            className="w-24 rounded-lg border border-gray-300 dark:border-slate-800 px-3 py-1.5 text-sm outline-none focus:border-primary bg-white dark:bg-slate-900 text-dark dark:text-white"
             min="0"
           />
           <span className="text-gray-400 dark:text-slate-500">–</span>
@@ -119,7 +119,7 @@ function BrowseContent() {
             placeholder="Max"
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
-            className="w-24 rounded-lg border border-gray-300 dark:border-slate-800 px-3 py-1.5 text-sm outline-none focus:border-primary bg-white dark:bg-slate-950 text-dark dark:text-white"
+            className="w-24 rounded-lg border border-gray-300 dark:border-slate-800 px-3 py-1.5 text-sm outline-none focus:border-primary bg-white dark:bg-slate-900 text-dark dark:text-white"
             min="0"
           />
           {(search || genre || minPrice || maxPrice || availability || sort !== "newest") && (
@@ -166,7 +166,7 @@ function BrowseContent() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 text-sm font-medium transition hover:bg-gray-50 dark:hover:bg-slate-900 text-gray-700 dark:text-slate-300 disabled:opacity-40"
+            className="rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 text-sm font-medium transition hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40"
           >
             Previous
           </button>
@@ -177,7 +177,7 @@ function BrowseContent() {
               className={`h-10 w-10 rounded-lg text-sm font-medium transition ${
                 p === page
                   ? "bg-primary text-white shadow-md"
-                  : "border border-gray-300 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-900"
+                  : "border border-gray-300 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800"
               }`}
             >
               {p}
@@ -186,7 +186,7 @@ function BrowseContent() {
           <button
             onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
             disabled={page >= pagination.pages}
-            className="rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 text-sm font-medium transition hover:bg-gray-50 dark:hover:bg-slate-900 text-gray-700 dark:text-slate-300 disabled:opacity-40"
+            className="rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 text-sm font-medium transition hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40"
           >
             Next
           </button>

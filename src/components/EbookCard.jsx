@@ -24,7 +24,7 @@ export default function EbookCard({ ebook, index = 0, purchased = false }) {
       className="h-full"
     >
       <Link href={`/ebooks/${ebook._id}`} className="group block h-full">
-        <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-shadow duration-300 hover:shadow-lg h-full flex flex-col">
+        <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm transition-shadow duration-300 hover:shadow-lg h-full flex flex-col">
           <div className="relative h-52 overflow-hidden bg-gradient-to-br from-purple-50 to-violet-100 dark:from-slate-800 dark:to-slate-950 shrink-0">
             {/* Wishlist Heart Toggle */}
             <button

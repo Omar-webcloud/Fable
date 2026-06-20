@@ -1,14 +1,14 @@
 export default function SkeletonLoader({ className = "" }) {
   return (
     <div
-      className={`animate-pulse rounded-lg bg-gray-200 ${className}`}
+      className={`animate-pulse rounded-lg bg-gray-200 dark:bg-slate-800 ${className}`}
     />
   );
 }
 
 export function EbookCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm">
       <SkeletonLoader className="h-48 w-full rounded-none" />
       <div className="space-y-3 p-4">
         <SkeletonLoader className="h-5 w-3/4" />

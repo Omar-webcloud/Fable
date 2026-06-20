@@ -32,7 +32,7 @@ export default function PrivacyPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background py-16">
+    <div className="min-h-screen bg-background dark:bg-dark py-16 transition-colors duration-200">
       <div className="mx-auto max-w-4xl px-4">
         {/* Header */}
         <div className="mb-12 text-center">
@@ -40,10 +40,10 @@ export default function PrivacyPage() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h1 className="text-4xl font-extrabold text-dark sm:text-5xl">
+            <h1 className="text-4xl font-extrabold text-dark dark:text-slate-100 sm:text-5xl">
               Privacy <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Policy</span>
             </h1>
-            <p className="mt-3 text-sm text-gray-500">
+            <p className="mt-3 text-sm text-gray-500 dark:text-slate-400">
               Last updated: June 19, 2026
             </p>
           </motion.div>
@@ -54,16 +54,16 @@ export default function PrivacyPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm md:p-12"
+          className="rounded-2xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-950 p-8 shadow-sm md:p-12"
         >
-          <div className="prose prose-purple max-w-none text-gray-600 space-y-8">
+          <div className="prose prose-purple max-w-none text-gray-600 dark:text-slate-300 space-y-8">
             <div>
-              <p className="text-lg leading-relaxed font-medium text-dark">
+              <p className="text-lg leading-relaxed font-medium text-dark dark:text-slate-200">
                 At Fable, we are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about this privacy policy, please contact us at support@fable.com.
               </p>
             </div>
 
-            <hr className="border-gray-100" />
+            <hr className="border-gray-100 dark:border-slate-800" />
 
             {sections.map((section, index) => (
               <motion.div
@@ -74,14 +74,14 @@ export default function PrivacyPage() {
                 transition={{ duration: 0.4, delay: index * 0.05 }}
                 className="space-y-3"
               >
-                <h2 className="text-xl font-bold text-dark">{section.title}</h2>
-                <p className="leading-relaxed text-gray-600">{section.content}</p>
+                <h2 className="text-xl font-bold text-dark dark:text-slate-200">{section.title}</h2>
+                <p className="leading-relaxed text-gray-600 dark:text-slate-400">{section.content}</p>
               </motion.div>
             ))}
 
-            <hr className="border-gray-100" />
+            <hr className="border-gray-100 dark:border-slate-800" />
 
-            <div className="rounded-xl bg-purple-50 p-6 text-sm text-primary">
+            <div className="rounded-xl bg-purple-50 dark:bg-purple-950/40 p-6 text-sm text-primary dark:text-purple-300">
               <h3 className="font-bold mb-2">Updates to this Policy</h3>
               <p>
                 We may update this privacy notice from time to time. The updated version will be indicated by an updated &quot;Revised&quot; date and the updated version will be effective as soon as it is accessible.

@@ -29,7 +29,7 @@ export default function DashboardLayout({ children }) {
       <div className="hidden lg:block">
         <DashboardSidebar />
       </div>
-      <main className="flex-1 bg-gray-50/50 dark:bg-slate-950/50 p-4 md:p-8">{children}</main>
+      <main className="flex-1 bg-gray-50/50 dark:bg-dark p-4 md:p-8">{children}</main>
     </div>
   );
 }

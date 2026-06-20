@@ -36,7 +36,7 @@ export default function DashboardSidebar() {
   const links = linksMap[role] || userLinks;
 
   return (
-    <aside className="w-64 shrink-0 border-r border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+    <aside className="w-64 shrink-0 border-r border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950">
       <div className="sticky top-16 p-4">
         <div className="mb-6 rounded-xl bg-gradient-to-br from-primary to-secondary p-4 text-white">
           <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-sm font-bold">

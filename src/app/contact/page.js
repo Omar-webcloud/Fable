@@ -27,7 +27,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background dark:bg-slate-950 py-12 transition-colors duration-200">
+    <div className="min-h-screen bg-background dark:bg-dark py-12 transition-colors duration-200">
       <div className="mx-auto max-w-5xl px-4">
         {/* Header */}
         <div className="mb-12 text-center">
@@ -51,7 +51,7 @@ export default function ContactPage() {
             transition={{ delay: 0.1 }}
             className="md:col-span-2 space-y-6"
           >
-            <div className="rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm border border-gray-100 dark:border-slate-800 transition-colors">
+            <div className="rounded-2xl bg-white dark:bg-slate-950 p-6 shadow-sm border border-gray-100 dark:border-slate-800 transition-colors">
               <h3 className="text-xl font-bold text-dark dark:text-slate-100 mb-4">Contact Information</h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
@@ -98,7 +98,7 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm border border-gray-100 dark:border-slate-800 transition-colors">
+            <div className="rounded-2xl bg-white dark:bg-slate-950 p-6 shadow-sm border border-gray-100 dark:border-slate-800 transition-colors">
               <h3 className="text-lg font-bold text-dark dark:text-slate-100 mb-2">Frequently Asked Questions</h3>
               <p className="text-sm text-gray-500 dark:text-slate-400 mb-3">
                 Looking for quick answers? Check out our help center or reader guidelines.
@@ -114,7 +114,7 @@ export default function ContactPage() {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="md:col-span-3 rounded-2xl bg-white dark:bg-slate-900 p-8 shadow-sm border border-gray-100 dark:border-slate-800 transition-colors"
+            className="md:col-span-3 rounded-2xl bg-white dark:bg-slate-950 p-8 shadow-sm border border-gray-100 dark:border-slate-800 transition-colors"
           >
             <h3 className="text-2xl font-bold text-dark dark:text-slate-100 mb-6">Send us a message</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -126,7 +126,7 @@ export default function ContactPage() {
                     required
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40 transition-all text-dark dark:text-slate-100"
+                    className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40 transition-all text-dark dark:text-slate-100"
                   />
                 </div>
                 <div>
@@ -136,7 +136,7 @@ export default function ContactPage() {
                     required
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40 transition-all text-dark dark:text-slate-100"
+                    className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40 transition-all text-dark dark:text-slate-100"
                   />
                 </div>
               </div>
@@ -148,7 +148,7 @@ export default function ContactPage() {
                   required
                   value={form.subject}
                   onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40 transition-all text-dark dark:text-slate-100"
+                  className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40 transition-all text-dark dark:text-slate-100"
                 />
               </div>
 
@@ -159,7 +159,7 @@ export default function ContactPage() {
                   required
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40 transition-all text-dark dark:text-slate-100"
+                  className="w-full rounded-lg border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40 transition-all text-dark dark:text-slate-100"
                 />
               </div>
 

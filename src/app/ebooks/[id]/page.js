@@ -72,14 +72,14 @@ export default function EbookDetailsPage() {
     return (
       <div className="mx-auto max-w-5xl px-4 py-12">
         <div className="grid gap-8 md:grid-cols-2">
-          <div className="animate-pulse rounded-xl bg-gray-200" style={{ height: 400 }} />
+          <div className="animate-pulse rounded-xl bg-gray-200 dark:bg-slate-800" style={{ height: 400 }} />
           <div className="space-y-4">
-            <div className="h-8 w-3/4 animate-pulse rounded bg-gray-200" />
-            <div className="h-5 w-1/2 animate-pulse rounded bg-gray-200" />
-            <div className="h-4 w-full animate-pulse rounded bg-gray-200" />
-            <div className="h-4 w-full animate-pulse rounded bg-gray-200" />
-            <div className="h-4 w-2/3 animate-pulse rounded bg-gray-200" />
-            <div className="h-10 w-40 animate-pulse rounded bg-gray-200" />
+            <div className="h-8 w-3/4 animate-pulse rounded bg-gray-200 dark:bg-slate-800" />
+            <div className="h-5 w-1/2 animate-pulse rounded bg-gray-200 dark:bg-slate-800" />
+            <div className="h-4 w-full animate-pulse rounded bg-gray-200 dark:bg-slate-800" />
+            <div className="h-4 w-full animate-pulse rounded bg-gray-200 dark:bg-slate-800" />
+            <div className="h-4 w-2/3 animate-pulse rounded bg-gray-200 dark:bg-slate-800" />
+            <div className="h-10 w-40 animate-pulse rounded bg-gray-200 dark:bg-slate-800" />
           </div>
         </div>
       </div>
@@ -92,8 +92,8 @@ export default function EbookDetailsPage() {
         <svg className="h-20 w-20 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
         </svg>
-        <h2 className="text-2xl font-bold text-dark">Ebook Not Found</h2>
-        <p className="text-gray-500">The ebook you&apos;re looking for doesn&apos;t exist.</p>
+        <h2 className="text-2xl font-bold text-dark dark:text-white">Ebook Not Found</h2>
+        <p className="text-gray-500 dark:text-slate-450">The ebook you&apos;re looking for doesn&apos;t exist.</p>
         <button onClick={() => router.push("/browse")} className="rounded-lg bg-primary px-6 py-2 text-white hover:bg-secondary">
           Browse Ebooks
         </button>
@@ -126,8 +126,8 @@ export default function EbookDetailsPage() {
         {/* Details */}
         <div>
           <div className="mb-2 flex items-center gap-3">
-            <span className="rounded-full bg-purple-50 px-3 py-1 text-sm font-medium text-primary">{ebook.genre}</span>
-            <span className={`rounded-full px-3 py-1 text-sm font-medium ${ebook.status === "published" ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-500"}`}>
+            <span className="rounded-full bg-purple-50 dark:bg-purple-950/40 px-3 py-1 text-sm font-medium text-primary dark:text-purple-300">{ebook.genre}</span>
+            <span className={`rounded-full px-3 py-1 text-sm font-medium ${ebook.status === "published" ? "bg-green-50 text-green-600 dark:bg-green-950/30 dark:text-green-400" : "bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400"}`}>
               {ebook.status === "published" ? "Available" : "Unpublished"}
             </span>
           </div>
@@ -139,7 +139,7 @@ export default function EbookDetailsPage() {
 
           <p className="mb-6 text-gray-600 dark:text-slate-300 leading-relaxed">{ebook.description}</p>
 
-          <div className="mb-6 rounded-xl bg-gray-50 dark:bg-slate-900/50 p-4">
+          <div className="mb-6 rounded-xl bg-gray-50 dark:bg-slate-950/50 border dark:border-slate-800/80 p-4">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-gray-500 dark:text-slate-400">Price</span>
@@ -201,7 +201,7 @@ export default function EbookDetailsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-12 rounded-2xl bg-white dark:bg-slate-900 p-8 shadow-lg border dark:border-slate-800"
+          className="mt-12 rounded-2xl bg-white dark:bg-slate-950 p-8 shadow-lg border dark:border-slate-800"
         >
           <h2 className="mb-4 text-2xl font-bold text-dark dark:text-white">Full Content</h2>
           <div className="prose max-w-none text-gray-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">

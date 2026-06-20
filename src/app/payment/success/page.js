@@ -54,8 +54,8 @@ function PaymentSuccessContent() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-dark">Payment Verification Failed</h2>
-        <p className="text-gray-500">We couldn&apos;t verify your payment. Please contact support.</p>
+        <h2 className="text-2xl font-bold text-dark dark:text-white">Payment Verification Failed</h2>
+        <p className="text-gray-500 dark:text-slate-400">We couldn&apos;t verify your payment. Please contact support.</p>
         <Link href="/browse" className="rounded-lg bg-primary px-6 py-3 text-white hover:bg-secondary">
           Browse Ebooks
         </Link>
@@ -68,7 +68,7 @@ function PaymentSuccessContent() {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-lg"
+        className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-8 text-center shadow-lg"
       >
         <motion.div
           initial={{ scale: 0 }}
@@ -81,19 +81,19 @@ function PaymentSuccessContent() {
           </svg>
         </motion.div>
 
-        <h1 className="mb-2 text-2xl font-bold text-dark">Purchase Successful!</h1>
-        <p className="mb-6 text-gray-500">
+        <h1 className="mb-2 text-2xl font-bold text-dark dark:text-white">Purchase Successful!</h1>
+        <p className="mb-6 text-gray-500 dark:text-slate-400">
           Thank you for your purchase. You can now access the full ebook content.
         </p>
 
         {purchase?.ebookId && (
-          <div className="mb-6 rounded-xl bg-gray-50 p-4 text-left">
-            <p className="text-sm text-gray-500">Ebook</p>
-            <p className="font-semibold text-dark">{purchase.ebookId.title || "Your ebook"}</p>
+          <div className="mb-6 rounded-xl bg-gray-50 dark:bg-slate-900 border dark:border-slate-800 p-4 text-left">
+            <p className="text-sm text-gray-500 dark:text-slate-400">Ebook</p>
+            <p className="font-semibold text-dark dark:text-slate-100">{purchase.ebookId.title || "Your ebook"}</p>
             {purchase.amount && (
               <>
-                <p className="mt-2 text-sm text-gray-500">Amount</p>
-                <p className="font-semibold text-primary">${purchase.amount}</p>
+                <p className="mt-2 text-sm text-gray-500 dark:text-slate-400">Amount</p>
+                <p className="font-semibold text-primary dark:text-purple-400">${purchase.amount}</p>
               </>
             )}
           </div>
@@ -110,7 +110,7 @@ function PaymentSuccessContent() {
           )}
           <Link
             href="/dashboard/user"
-            className="flex-1 rounded-lg border border-gray-300 px-4 py-3 font-semibold text-dark transition hover:bg-gray-50"
+            className="flex-1 rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-3 font-semibold text-dark dark:text-slate-200 transition hover:bg-gray-50 dark:hover:bg-slate-900"
           >
             My Purchases
           </Link>

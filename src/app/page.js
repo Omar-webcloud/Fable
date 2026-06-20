@@ -28,7 +28,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="bg-background dark:bg-slate-950 transition-colors duration-200 min-h-screen">
+    <div className="bg-background dark:bg-dark transition-colors duration-200 min-h-screen">
       <HeroBanner />
 
       {/* Featured Ebooks */}
@@ -56,7 +56,7 @@ export default function HomePage() {
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.05 }}
                     whileHover={{ y: -6, scale: 1.02 }}
-                    className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-shadow hover:shadow-md"
+                    className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm transition-shadow hover:shadow-md"
                   >
                     <div className="flex h-48 items-center justify-center bg-gradient-to-br from-purple-50 to-violet-100 dark:from-slate-800 dark:to-slate-950">
                       <svg className="h-16 w-16 text-purple-200 dark:text-purple-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,7 +76,7 @@ export default function HomePage() {
       </section>
 
       {/* Top Writers */}
-      <section className="bg-white dark:bg-slate-900/40 border-y border-gray-100 dark:border-slate-800/80 py-16 transition-colors">
+      <section className="bg-white dark:bg-slate-950/40 border-y border-gray-100 dark:border-slate-800/80 py-16 transition-colors">
         <div className="mx-auto max-w-7xl px-4">
           <motion.h2
             initial={{ opacity: 0, x: -20 }}
@@ -89,7 +89,7 @@ export default function HomePage() {
           <div className="grid gap-6 md:grid-cols-3">
             {loadingWriters
               ? Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="animate-pulse rounded-xl border border-gray-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-6 text-center">
+                  <div key={i} className="animate-pulse rounded-xl border border-gray-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 p-6 text-center">
                     <div className="mx-auto mb-4 h-20 w-20 rounded-full bg-gray-200 dark:bg-slate-800" />
                     <div className="mx-auto mb-2 h-5 w-24 rounded bg-gray-200 dark:bg-slate-800" />
                     <div className="mx-auto h-4 w-16 rounded bg-gray-200 dark:bg-slate-800" />
@@ -107,7 +107,7 @@ export default function HomePage() {
                     viewport={{ once: true, margin: "-10px" }}
                     transition={{ delay: i * 0.1, type: "spring", stiffness: 80, damping: 12 }}
                     whileHover={{ y: -8, scale: 1.03 }}
-                    className="rounded-xl border border-gray-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 p-6 text-center shadow-sm transition-shadow duration-300 hover:shadow-md"
+                    className="rounded-xl border border-gray-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 p-6 text-center shadow-sm transition-shadow duration-300 hover:shadow-md"
                   >
                     <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full ring-4 ring-purple-100 dark:ring-purple-900/40 bg-gradient-to-br from-primary to-secondary text-2xl font-bold text-white shadow-lg">
                       <svg className="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,7 +144,7 @@ export default function HomePage() {
             >
               <Link
                 href={`/browse?genre=${genre.toLowerCase()}`}
-                className="block rounded-xl bg-white dark:bg-slate-900 p-6 text-center font-semibold text-dark dark:text-slate-200 border border-gray-100 dark:border-slate-800/80 shadow-sm transition-all hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white hover:shadow-lg"
+                className="block rounded-xl bg-white dark:bg-slate-950 p-6 text-center font-semibold text-dark dark:text-slate-200 border border-gray-100 dark:border-slate-800/80 shadow-sm transition-all hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white hover:shadow-lg"
               >
                 {genre}
               </Link>
