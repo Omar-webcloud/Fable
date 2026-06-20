@@ -137,7 +137,7 @@ function AdminDashboardContent() {
   };
 
   return (
-    <div>
+    <div className="p-4 sm:p-6">
       <h1 className="mb-6 text-2xl font-bold text-dark">Admin Dashboard</h1>
 
       {/* Tab Navigation (mobile) */}
@@ -182,6 +182,33 @@ function AdminDashboardContent() {
 
           {/* Charts */}
           <div className="grid gap-6 xl:grid-cols-2">
+        {/* Responsive chart containers */}
+        <div className="w-full h-64 sm:h-80">
+          {loadingOverview ? (
+            <div className="flex h-64 flex-col justify-end gap-2 pb-4">
+              {/* Skeleton loaders remain */}
+              <div className="flex items-end gap-4 h-full px-4">
+                <SkeletonLoader className="h-1/3 w-full" />
+                <SkeletonLoader className="h-2/3 w-full" />
+                <SkeletonLoader className="h-1/2 w-full" />
+                <SkeletonLoader className="h-3/4 w-full" />
+                <SkeletonLoader className="h-full w-full" />
+                <SkeletonLoader className="h-1/4 w-full" />
+              </div>
+            </div>
+          ) : (
+            <MonthlySalesChart data={monthlySales} />
+          )}
+        </div>
+        <div className="w-full h-64 sm:h-80">
+          {loadingOverview ? (
+            <div className="flex h-64 items-center justify-center">
+              <SkeletonLoader className="h-48 w-48 rounded-full" />
+            </div>
+          ) : (
+            <GenreDistributionChart data={genreData} />
+          )}
+        </div>
             <div className="rounded-xl bg-white p-6 shadow-sm">
               <h3 className="mb-4 text-lg font-semibold text-dark">Monthly Sales</h3>
               {loadingOverview ? (
@@ -221,7 +248,7 @@ function AdminDashboardContent() {
       {activeTab === "users" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl bg-white shadow-sm">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm min-w-[600px]">
               <thead className="border-b bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 font-semibold text-gray-600">Name</th>
@@ -263,7 +290,7 @@ function AdminDashboardContent() {
       {activeTab === "ebooks" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl bg-white shadow-sm">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm min-w-[600px]">
               <thead className="border-b bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 font-semibold text-gray-600">Title</th>
@@ -312,7 +339,7 @@ function AdminDashboardContent() {
       {activeTab === "transactions" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl bg-white shadow-sm">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm min-w-[600px]">
               <thead className="border-b bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 font-semibold text-gray-600">Transaction ID</th>

@@ -158,7 +158,7 @@ function WriterDashboardContent() {
       {activeTab === "ebooks" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl bg-white dark:bg-slate-900 border dark:border-slate-800 shadow-sm">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm min-w-[600px]">
               <thead className="border-b dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
                 <tr>
                   <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Title</th>

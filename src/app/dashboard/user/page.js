@@ -52,7 +52,7 @@ function UserDashboardContent() {
   }, [user]);
 
   return (
-    <div>
+    <div className="p-4 sm:p-6">
       <h1 className="mb-6 text-2xl font-bold text-dark dark:text-white">User Dashboard</h1>
 
       {/* Tab Navigation (mobile) */}
@@ -138,7 +138,7 @@ function UserDashboardContent() {
       {activeTab === "purchases" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl bg-white dark:bg-slate-900 border dark:border-slate-800 shadow-sm">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm min-w-[600px]">
               <thead className="border-b dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
                 <tr>
                   <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Ebook</th>
