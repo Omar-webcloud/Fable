@@ -98,9 +98,9 @@ function WriterDashboardContent() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-2xl font-bold text-dark dark:text-white">Writer Dashboard</h1>
-        <Link href="/dashboard/writer/add-ebook" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-secondary">
+        <Link href="/dashboard/writer/add-ebook" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white text-center transition hover:bg-secondary">
           + Add Ebook
         </Link>
       </div>
@@ -211,7 +211,7 @@ function WriterDashboardContent() {
       {activeTab === "sales" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 shadow-sm">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm min-w-[600px]">
               <thead className="border-b dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50">
                 <tr>
                   <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Ebook</th>

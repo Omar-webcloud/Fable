@@ -41,39 +41,71 @@ export default function LoginPage() {
   }, [login, router, roleToggle]);
 
   useEffect(() => {
+    let cleanupResize = () => {};
+
     const initGoogle = () => {
       const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
       if (!clientId) return;
 
-      if (window.google?.accounts?.id) {
-        window.google.accounts.id.initialize({
-          client_id: clientId,
-          callback: handleGoogleCredential,
-        });
-        window.google.accounts.id.renderButton(
-          document.getElementById("google-signin-btn"),
-          {
-            theme: "outline",
-            size: "large",
-            width: 382,
-            text: "continue_with",
-            shape: "rectangular",
-          }
-        );
-      }
+      const renderButton = () => {
+        const btnContainer = document.getElementById("google-signin-btn");
+        if (!btnContainer) return;
+        
+        btnContainer.innerHTML = "";
+        const containerWidth = btnContainer.offsetWidth;
+        const buttonWidth = containerWidth > 0 
+          ? Math.min(400, Math.max(200, containerWidth)) 
+          : (typeof window !== "undefined" ? Math.min(400, Math.max(200, window.innerWidth - 80)) : 382);
+
+        if (window.google?.accounts?.id) {
+          window.google.accounts.id.initialize({
+            client_id: clientId,
+            callback: handleGoogleCredential,
+          });
+          window.google.accounts.id.renderButton(
+            btnContainer,
+            {
+              theme: "outline",
+              size: "large",
+              width: buttonWidth,
+              text: "continue_with",
+              shape: "rectangular",
+            }
+          );
+        }
+      };
+
+      renderButton();
+
+      let resizeTimeout;
+      const handleResize = () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(renderButton, 200);
+      };
+
+      window.addEventListener("resize", handleResize);
+      cleanupResize = () => {
+        window.removeEventListener("resize", handleResize);
+        clearTimeout(resizeTimeout);
+      };
     };
 
+    let interval;
     if (window.google?.accounts?.id) {
       initGoogle();
     } else {
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         if (window.google?.accounts?.id) {
           initGoogle();
           clearInterval(interval);
         }
       }, 500);
-      return () => clearInterval(interval);
     }
+
+    return () => {
+      if (interval) clearInterval(interval);
+      cleanupResize();
+    };
   }, [handleGoogleCredential]);
 
   const handleSubmit = async (e) => {
@@ -106,7 +138,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-[70vh] items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-950 p-8 shadow-lg border dark:border-slate-800">
+      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-950 p-5 sm:p-8 shadow-lg border dark:border-slate-800">
         <h1 className="mb-6 text-center text-3xl font-bold text-dark dark:text-white">Login</h1>
 
         {/* Role Toggle */}

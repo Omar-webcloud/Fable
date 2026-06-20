@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { useAuth } from "@/providers/AuthProvider";
 import { cn } from "@/utils";
 
@@ -27,13 +28,16 @@ const adminLinks = [
   { href: "/dashboard/admin?tab=transactions", label: "Transactions", icon: "M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" },
 ];
 
-export default function DashboardSidebar() {
+function SidebarContent() {
   const { user } = useAuth();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const role = user?.role || "user";
   const linksMap = { user: userLinks, writer: writerLinks, admin: adminLinks };
   const links = linksMap[role] || userLinks;
+
+  const currentTab = searchParams.get("tab") || "";
 
   return (
     <aside className="w-64 shrink-0 border-r border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950">
@@ -48,8 +52,11 @@ export default function DashboardSidebar() {
 
         <nav className="space-y-1">
           {links.map((link) => {
-            const isActive = pathname + (typeof window !== "undefined" ? window.location.search : "") === link.href
-              || (link.href.includes("?") === false && pathname === link.href);
+            const urlObj = new URL(link.href, "http://localhost");
+            const linkPathname = urlObj.pathname;
+            const linkTab = urlObj.searchParams.get("tab") || "";
+
+            const isActive = pathname === linkPathname && currentTab === linkTab;
 
             return (
               <Link
@@ -93,5 +100,15 @@ export default function DashboardSidebar() {
         )}
       </div>
     </aside>
+  );
+}
+
+export default function DashboardSidebar() {
+  return (
+    <Suspense fallback={
+      <aside className="w-64 shrink-0 border-r border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 h-[calc(100vh-80px)] sticky top-16" />
+    }>
+      <SidebarContent />
+    </Suspense>
   );
 }

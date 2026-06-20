@@ -137,7 +137,7 @@ function AdminDashboardContent() {
   };
 
   return (
-    <div className="p-4 sm:p-6">
+    <div>
       <h1 className="mb-6 text-2xl font-bold text-dark dark:text-white">Admin Dashboard</h1>
 
       {/* Tab Navigation (mobile) */}

@@ -80,8 +80,8 @@ export default function AddEbookPage() {
           {/* Cover Image Upload */}
           <div className="mb-6">
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">Cover Image</label>
-            <div className="flex items-start gap-4">
-              <div className="flex h-40 w-28 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-300 dark:border-slate-800 bg-gray-50 dark:bg-slate-900">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="flex h-40 w-28 shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-300 dark:border-slate-800 bg-gray-50 dark:bg-slate-900">
                 {imagePreview ? (
                   <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
                 ) : (
