@@ -25,11 +25,11 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-80px)]">
+    <div className="mx-auto w-full max-w-7xl flex min-h-[calc(100vh-80px)] px-4">
       <div className="hidden lg:block">
         <DashboardSidebar />
       </div>
-      <main className="flex-1 bg-gray-50/50 dark:bg-dark p-3 sm:p-6 md:p-8">{children}</main>
+      <main className="flex-1 min-w-0 bg-gray-50/50 dark:bg-dark p-3 sm:p-6 md:p-8">{children}</main>
     </div>
   );
 }
