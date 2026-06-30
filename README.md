@@ -1,4 +1,4 @@
-# Fable Ebook Sharing Platform
+# Fable E-book Sharing Platform
 
 ## Live URL
 https://fable-umber.vercel.app/
@@ -34,10 +34,3 @@ The platform serves multiple user pathways:
 * Details page for reading descriptions and completing purchases
 * Secure dashboards customized for readers, writers, and administrators
 
-## Environment Variables
-The following environment configurations are required to run the frontend client:
-* NEXT_PUBLIC_API_URL
-* NEXT_PUBLIC_IMGBB_KEY
-* NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-* NEXT_PUBLIC_APP_URL
-* BETTER_AUTH_URL
