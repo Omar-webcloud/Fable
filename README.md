@@ -1,4 +1,4 @@
-# Fable E-book Sharing Platform
+# Fable E-book Platform
 
 ## Live URL
 https://fable-umber.vercel.app/
