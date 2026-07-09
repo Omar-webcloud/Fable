@@ -65,8 +65,8 @@ function SidebarContent() {
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
                   isActive
-                    ? "bg-primary/10 text-primary dark:bg-primary/20 dark:text-purple-400"
-                    : "text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-dark dark:hover:text-white"
+                    ? "bg-primary/10 text-primary shadow-sm dark:bg-primary/20 dark:text-purple-400"
+                    : "text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-dark dark:hover:text-white hover:scale-[1.02] active:scale-95"
                 )}
               >
                 <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
@@ -82,17 +82,17 @@ function SidebarContent() {
           <div className="mt-4 border-t border-gray-100 dark:border-slate-800 pt-4">
             <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-slate-500">Other Dashboards</p>
             {role === "admin" && (
-              <Link href="/dashboard/user" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-dark dark:hover:text-white">
+              <Link href="/dashboard/user" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-500 dark:text-slate-400 transition-all hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-dark dark:hover:text-white hover:scale-[1.02] active:scale-95">
                 User View
               </Link>
             )}
             {role === "admin" && (
-              <Link href="/dashboard/writer" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-dark dark:hover:text-white">
+              <Link href="/dashboard/writer" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-500 dark:text-slate-400 transition-all hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-dark dark:hover:text-white hover:scale-[1.02] active:scale-95">
                 Writer View
               </Link>
             )}
             {role === "writer" && (
-              <Link href="/dashboard/user" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-dark dark:hover:text-white">
+              <Link href="/dashboard/user" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-500 dark:text-slate-400 transition-all hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-dark dark:hover:text-white hover:scale-[1.02] active:scale-95">
                 User View
               </Link>
             )}

@@ -30,7 +30,7 @@ export default function EbookCard({ ebook, index = 0, purchased = false }) {
             <button
               type="button"
               onClick={handleWishlistClick}
-              className="absolute right-2 top-2 z-10 rounded-full bg-white/80 p-2 text-gray-500 dark:text-gray-400 backdrop-blur-sm transition hover:bg-white hover:text-red-500 dark:bg-slate-950/80 dark:hover:bg-slate-900 dark:hover:text-red-500 shadow-sm"
+              className="absolute right-2 top-2 z-10 rounded-full bg-white/80 p-2 text-gray-500 dark:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-white hover:text-red-500 hover:shadow-md active:scale-95 dark:bg-slate-950/80 dark:hover:bg-slate-900 dark:hover:text-red-500 shadow-sm"
               aria-label="Toggle Wishlist"
             >
               <svg className="h-5 w-5" fill={wishlisted ? "#EF4444" : "none"} stroke={wishlisted ? "#EF4444" : "currentColor"} strokeWidth={2} viewBox="0 0 24 24">
@@ -42,7 +42,7 @@ export default function EbookCard({ ebook, index = 0, purchased = false }) {
               <img
                 src={ebook.coverImage}
                 alt={ebook.title}
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                className="h-full w-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:rotate-1"
               />
             ) : (
               <div className="flex h-full items-center justify-center">
@@ -60,7 +60,7 @@ export default function EbookCard({ ebook, index = 0, purchased = false }) {
           </div>
           <div className="p-4 flex-1 flex flex-col justify-between">
             <div>
-              <h3 className="line-clamp-1 font-semibold text-dark dark:text-white transition-colors group-hover:text-primary dark:group-hover:text-purple-400">
+              <h3 className="line-clamp-1 font-semibold text-dark dark:text-white transition-colors duration-300 group-hover:text-primary dark:group-hover:text-purple-400">
                 {ebook.title}
               </h3>
               <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">{ebook.writerName}</p>

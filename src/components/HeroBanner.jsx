@@ -44,7 +44,7 @@ export default function HeroBanner() {
         <motion.div variants={itemVariants}>
           <Link
             href="/browse"
-            className="inline-block rounded-xl bg-accent px-8 py-3 font-semibold text-dark transition hover:bg-yellow-400 hover:scale-105 active:scale-95"
+            className="inline-block rounded-xl bg-accent px-8 py-3 font-semibold text-dark shadow-md transition-all duration-300 hover:bg-yellow-400 hover:scale-105 hover:shadow-lg hover:-translate-y-1 active:scale-95"
           >
             Browse Ebooks
           </Link>
