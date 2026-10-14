@@ -2,13 +2,13 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, BookOpen, Sparkles, Feather } from "lucide-react";
+import { ArrowRight, Feather } from "lucide-react";
 
 export default function HeroBanner() {
   const headline = "Discover & Read Original Ebooks";
 
   return (
-    <section className="relative w-full overflow-hidden border-b border-zinc-700/30">
+    <section className="relative flex min-h-screen w-full items-center overflow-hidden border-b border-zinc-700/30">
       {/* Background Hero Image from Skydda */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -30,21 +30,8 @@ export default function HeroBanner() {
       />
 
       {/* Content Container */}
-      <div className="relative z-10 mx-auto max-w-7xl px-6 py-28 md:px-12 md:py-36 lg:py-44">
-        <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex items-center gap-3 px-4 py-2 border border-zinc-700 bg-zinc-900/80 backdrop-blur-md w-fit"
-          >
-            <div className="w-2.5 h-2.5 bg-amber-500" />
-            <span className="text-xs sm:text-sm font-medium text-zinc-300 tracking-wide uppercase">
-              Next-Gen Ebook Platform
-            </span>
-          </motion.div>
-
+      <div className="relative z-10 mx-auto max-w-7xl px-6 py-24 md:px-12 md:py-28 lg:py-32">
+        <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
           {/* Heading with word-by-word blur-in animation from Skydda */}
           <h1 className="text-balance text-4xl sm:text-6xl md:text-7xl lg:text-7xl font-normal tracking-tight text-white leading-[1.08]">
             {headline.split(" ").map((word, i) => (
@@ -60,22 +47,12 @@ export default function HeroBanner() {
             ))}
           </h1>
 
-          {/* Subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="max-w-2xl text-balance text-base sm:text-lg md:text-xl text-zinc-300 leading-relaxed font-normal"
-          >
-            Explore captivating stories from independent writers around the globe. Instant reading, direct author payouts, and a clutter-free digital library.
-          </motion.p>
-
           {/* CTAs */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="flex flex-col sm:flex-row items-center gap-4 pt-4 w-full sm:w-auto"
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mt-8 flex w-full flex-col items-center gap-4 sm:mt-10 sm:w-auto sm:flex-row"
           >
             <Link
               href="/browse"
@@ -98,8 +75,8 @@ export default function HeroBanner() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.7 }}
-            className="grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-12 pt-12 border-t border-zinc-800/80 w-full max-w-2xl mt-8 text-center"
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="mt-12 grid w-full max-w-2xl grid-cols-2 gap-6 border-t border-zinc-800/80 pt-8 text-center sm:mt-16 sm:grid-cols-3 sm:gap-12 sm:pt-10"
           >
             <div>
               <div className="text-2xl sm:text-3xl font-normal text-white font-mono">100%</div>

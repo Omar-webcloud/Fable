@@ -26,7 +26,12 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-zinc-700/30 bg-zinc-900/90 backdrop-blur-md">
+    <nav
+      className={cn(
+        "sticky top-[30px] z-50 mx-auto w-[calc(100%-2rem)] max-w-[1280px] rounded-lg border border-zinc-700/30 bg-zinc-900/60 shadow-lg shadow-black/10 backdrop-blur-xl",
+        pathname === "/" && "mt-[30px] -mb-[96px]"
+      )}
+    >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-12">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2 text-white group">
@@ -109,7 +114,7 @@ export default function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileOpen && (
-        <div className="border-t border-zinc-700/30 bg-zinc-900/95 px-6 py-6 backdrop-blur-md md:hidden">
+        <div className="absolute left-0 right-0 top-full mt-2 rounded-lg border border-zinc-700/50 bg-zinc-950 px-6 py-6 shadow-xl shadow-black/30 md:hidden">
           <div className="flex flex-col gap-4">
             {links.map((link) => (
               <Link
