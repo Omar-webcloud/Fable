@@ -6,13 +6,16 @@ import Link from "next/link";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { useAuth } from "@/providers/AuthProvider";
-import { ebookService, writerService } from "@/services";
+import { ebookService } from "@/services";
 import EbookCard from "@/components/EbookCard";
 import { EbookCardSkeleton } from "@/components/SkeletonLoader";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { formatPrice, formatDate } from "@/utils";
 import api from "@/lib/axios";
 import { useWishlist } from "@/providers/WishlistProvider";
+import { SectionBadge } from "@/components/ui/SectionHeader";
+import { Plus, BookOpen, TrendingUp, DollarSign, Edit3, Trash2, Eye, EyeOff, ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const tabs = [
   { key: "overview", label: "Overview" },
@@ -28,7 +31,6 @@ function WriterDashboardContent() {
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "overview");
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Keep state in sync with URL search params (desktop sidebar clicks)
   useEffect(() => {
     const tab = searchParams.get("tab") || "overview";
     setActiveTab(tab);
@@ -74,54 +76,68 @@ function WriterDashboardContent() {
         toast.success("Ebook unpublished");
       } else {
         await ebookService.publish(ebookId);
-        toast.success("Ebook published!");
+        toast.success("Ebook published to library!");
       }
       setEbooks((prev) =>
         prev.map((e) =>
-          e._id === ebookId ? { ...e, status: currentStatus === "published" ? "unpublished" : "published" } : e
+          e._id === ebookId
+            ? { ...e, status: currentStatus === "published" ? "unpublished" : "published" }
+            : e
         )
       );
     } catch (err) {
-      toast.error(err.response?.data?.error || "Failed to update status");
+      toast.error(err.response?.data?.error || "Failed to update publication status");
     }
   };
 
   const handleDelete = async (ebookId) => {
-    if (!confirm("Are you sure you want to delete this ebook?")) return;
+    if (!confirm("Are you sure you want to permanently delete this ebook?")) return;
     try {
       await ebookService.delete(ebookId);
       setEbooks((prev) => prev.filter((e) => e._id !== ebookId));
-      toast.success("Ebook deleted");
+      toast.success("Ebook deleted successfully");
     } catch (err) {
-      toast.error(err.response?.data?.error || "Failed to delete");
+      toast.error(err.response?.data?.error || "Failed to delete ebook");
     }
   };
 
   return (
-    <div>
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-dark dark:text-white">Writer Dashboard</h1>
-        <Link href="/dashboard/writer/add-ebook" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white text-center transition hover:bg-secondary">
-          + Add Ebook
+    <div className="space-y-8">
+      {/* Title & Add Ebook CTA */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-6">
+        <div className="space-y-2">
+          <SectionBadge>Creator Operations</SectionBadge>
+          <h1 className="text-3xl font-normal tracking-tight text-white">Writer Studio</h1>
+          <p className="text-xs text-zinc-400">
+            Publish original manuscripts, monitor gross earnings, and inspect real-time unit sales.
+          </p>
+        </div>
+
+        <Link
+          href="/dashboard/writer/add-ebook"
+          className="flex items-center justify-center gap-2 bg-white px-5 py-2.5 text-xs font-medium text-zinc-950 hover:bg-zinc-200 transition-all active:scale-95 shadow-md shrink-0 cursor-pointer"
+        >
+          <Plus className="h-4 w-4" />
+          <span>Publish New Ebook</span>
         </Link>
       </div>
 
-      {/* Tab Navigation (mobile) */}
-      <div className="relative mb-6 lg:hidden">
+      {/* Mobile Tab Navigation */}
+      <div className="relative lg:hidden">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="flex w-full items-center justify-between rounded-lg border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-slate-200 shadow-sm focus:outline-none"
+          className="flex w-full items-center justify-between border border-zinc-700 bg-zinc-900 px-4 py-3 text-xs font-mono uppercase tracking-wider text-white"
         >
           <span>{tabs.find((t) => t.key === activeTab)?.label || "Menu"}</span>
-          <svg className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${menuOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+          <ChevronDown
+            className={`h-4 w-4 text-zinc-400 transition-transform ${menuOpen ? "rotate-180" : ""}`}
+          />
         </button>
 
         {menuOpen && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-            <div className="absolute left-0 right-0 z-20 mt-1 rounded-lg border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-1 shadow-lg">
+            <div className="absolute left-0 right-0 z-20 mt-1 border border-zinc-700 bg-zinc-900 shadow-2xl">
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
@@ -130,11 +146,12 @@ function WriterDashboardContent() {
                     router.push(`?tab=${tab.key}`, { scroll: false });
                     setMenuOpen(false);
                   }}
-                  className={`flex w-full items-center px-4 py-2.5 text-sm font-medium transition ${
+                  className={cn(
+                    "flex w-full items-center px-4 py-3 text-xs font-mono uppercase tracking-wider transition-colors",
                     activeTab === tab.key
-                      ? "bg-primary/10 text-primary dark:bg-primary/20 dark:text-purple-400"
-                      : "text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-900"
-                  }`}
+                      ? "bg-zinc-800 text-amber-500 font-bold"
+                      : "text-zinc-400 hover:bg-zinc-800/60 hover:text-white"
+                  )}
                 >
                   {tab.label}
                 </button>
@@ -144,155 +161,175 @@ function WriterDashboardContent() {
         )}
       </div>
 
-      {/* Overview */}
+      {/* Overview Tab */}
       {activeTab === "overview" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <div className="mb-6 grid gap-4 sm:grid-cols-3">
-            <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-5 shadow-sm">
-              <p className="text-sm text-gray-500 dark:text-slate-400">Total Ebooks</p>
-              <p className="mt-1 text-3xl font-bold text-primary dark:text-purple-400">{stats?.totalEbooks ?? ebooks.length}</p>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+          {/* Metric Cards */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="border border-zinc-700/40 bg-zinc-900/60 p-6 space-y-2">
+              <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                Published Titles
+              </div>
+              <div className="text-3xl font-mono font-medium text-white">
+                {stats?.totalEbooks ?? ebooks.length}
+              </div>
+              <div className="text-[11px] text-zinc-500">Active titles in catalog</div>
             </div>
-            <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-5 shadow-sm">
-              <p className="text-sm text-gray-500 dark:text-slate-400">Total Sales</p>
-              <p className="mt-1 text-3xl font-bold text-secondary dark:text-purple-300">{stats?.totalSales ?? sales.length}</p>
+
+            <div className="border border-zinc-700/40 bg-zinc-900/60 p-6 space-y-2">
+              <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                Total Units Sold
+              </div>
+              <div className="text-3xl font-mono font-medium text-white">
+                {stats?.totalSales ?? sales.length}
+              </div>
+              <div className="text-[11px] text-zinc-500">Individual reader purchases</div>
             </div>
-            <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-5 shadow-sm">
-              <p className="text-sm text-gray-500 dark:text-slate-400">Revenue</p>
-              <p className="mt-1 text-3xl font-bold text-accent dark:text-amber-400">{formatPrice(stats?.totalRevenue ?? 0)}</p>
+
+            <div className="border border-zinc-700/40 bg-zinc-900/60 p-6 space-y-2">
+              <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                Creator Revenue
+              </div>
+              <div className="text-3xl font-mono font-medium text-amber-500">
+                {formatPrice(stats?.totalRevenue ?? 0)}
+              </div>
+              <div className="text-[11px] text-zinc-500">Direct Stripe author royalties</div>
             </div>
           </div>
 
-          <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-6 shadow-sm">
-            <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Recent Sales</h3>
+          {/* Recent Sales Activity */}
+          <div className="border border-zinc-700/40 bg-zinc-900/60 p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+              <h3 className="text-sm font-medium uppercase tracking-wider font-mono text-zinc-300">
+                Recent Reader Sales Activity
+              </h3>
+              <button
+                onClick={() => setActiveTab("sales")}
+                className="text-xs text-amber-500 hover:text-amber-400 font-mono cursor-pointer"
+              >
+                All Sales History &rarr;
+              </button>
+            </div>
+
             {sales.length > 0 ? (
               <div className="space-y-3">
                 {sales.slice(0, 5).map((s) => (
-                  <div key={s._id} className="flex items-center justify-between rounded-lg bg-gray-50 dark:bg-slate-900 border dark:border-slate-800 p-3">
+                  <div
+                    key={s._id}
+                    className="flex items-center justify-between border border-zinc-800 bg-zinc-950 p-4"
+                  >
                     <div>
-                      <p className="font-medium text-dark dark:text-white">{s.ebookId?.title || "Ebook"}</p>
-                      <p className="text-sm text-gray-500 dark:text-slate-400">by {s.buyerId?.name || "buyer"} — {formatDate(s.purchaseDate)}</p>
+                      <p className="font-medium text-sm text-white">{s.ebookId?.title || "Original Title"}</p>
+                      <p className="text-xs text-zinc-400 font-mono mt-0.5">
+                        Purchased by {s.buyerId?.name || "Reader"} • {formatDate(s.purchaseDate)}
+                      </p>
                     </div>
-                    <span className="font-semibold text-primary dark:text-purple-400">{formatPrice(s.amount)}</span>
+                    <span className="font-mono text-sm font-medium text-amber-500">
+                      {formatPrice(s.amount)}
+                    </span>
                   </div>
                 ))}
               </div>
-            ) : <p className="text-gray-400 dark:text-slate-500">No sales yet</p>}
-          </div>
-        </motion.div>
-      )}
-
-      {/* Manage Ebooks */}
-      {activeTab === "ebooks" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm min-w-[600px]">
-              <thead className="border-b dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50">
-                <tr>
-                  <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Title</th>
-                  <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Price</th>
-                  <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Status</th>
-                  <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Sales</th>
-                  <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y dark:divide-slate-800">
-                {loading ? (
-                  Array.from({ length: 3 }).map((_, i) => (
-                    <tr key={i}><td colSpan={5} className="px-4 py-3"><div className="h-5 animate-pulse rounded bg-gray-100 dark:bg-slate-800" /></td></tr>
-                  ))
-                ) : ebooks.length > 0 ? (
-                  ebooks.map((eb) => (
-                    <tr key={eb._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
-                      <td className="px-4 py-3 font-medium text-dark dark:text-slate-200">{eb.title}</td>
-                      <td className="px-4 py-3 text-primary dark:text-purple-400 font-semibold">{formatPrice(eb.price)}</td>
-                      <td className="px-4 py-3">
-                        <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${eb.status === "published" ? "bg-green-50 text-green-600 dark:bg-green-950/30 dark:text-green-400" : "bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400"}`}>
-                          {eb.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-gray-500 dark:text-slate-400">{eb.totalSales || 0}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex gap-2">
-                          <Link href={`/dashboard/writer/edit/${eb._id}`}
-                            className="rounded bg-blue-50 dark:bg-blue-950/30 px-2.5 py-1 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50">Edit</Link>
-                          <button onClick={() => handlePublishToggle(eb._id, eb.status)}
-                            className={`rounded px-2.5 py-1 text-xs font-medium ${eb.status === "published" ? "bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50" : "bg-green-50 dark:bg-green-950/30 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50"}`}>
-                            {eb.status === "published" ? "Unpublish" : "Publish"}
-                          </button>
-                          <button onClick={() => handleDelete(eb._id)}
-                            className="rounded bg-red-50 dark:bg-red-950/30 px-2.5 py-1 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50">Delete</button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400 dark:text-slate-500">No ebooks yet. <Link href="/dashboard/writer/add-ebook" className="text-primary dark:text-purple-400 hover:underline">Add your first ebook</Link></td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Sales History */}
-      {activeTab === "sales" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          {/* Card list for Mobile */}
-          <div className="space-y-4 sm:hidden">
-            {loading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="animate-pulse rounded-xl border dark:border-slate-800 bg-white dark:bg-slate-950 p-4 space-y-3">
-                  <div className="h-5 w-2/3 rounded bg-gray-100 dark:bg-slate-800" />
-                  <div className="h-4 w-1/2 rounded bg-gray-100 dark:bg-slate-800" />
-                  <div className="h-4 w-1/3 rounded bg-gray-100 dark:bg-slate-800" />
-                </div>
-              ))
-            ) : sales.length > 0 ? (
-              sales.map((s) => (
-                <div key={s._id} className="rounded-xl border dark:border-slate-800 bg-white dark:bg-slate-950 p-4 shadow-sm space-y-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <h4 className="font-semibold text-dark dark:text-slate-200">{s.ebookId?.title || "Ebook"}</h4>
-                    <span className="font-bold text-primary dark:text-purple-400 shrink-0">{formatPrice(s.amount)}</span>
-                  </div>
-                  <div className="flex flex-col text-xs text-gray-500 dark:text-slate-400 space-y-1">
-                    <p><span className="font-medium text-gray-400">Buyer:</span> {s.buyerId?.name || "—"}</p>
-                    <p><span className="font-medium text-gray-400">Date:</span> {formatDate(s.purchaseDate)}</p>
-                  </div>
-                </div>
-              ))
             ) : (
-              <div className="rounded-xl border dark:border-slate-800 bg-white dark:bg-slate-950 p-6 text-center text-gray-400">No sales yet</div>
+              <p className="py-8 text-center text-xs font-mono text-zinc-500">
+                No reader transactions recorded yet.
+              </p>
             )}
           </div>
+        </motion.div>
+      )}
 
-          {/* Desktop Table View */}
-          <div className="hidden sm:block rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 shadow-sm overflow-hidden">
+      {/* Manage Ebooks Tab */}
+      {activeTab === "ebooks" && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          <div className="border border-zinc-700/40 bg-zinc-900/60 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50">
+              <table className="w-full text-left text-xs font-mono min-w-[700px]">
+                <thead className="border-b border-zinc-700/50 bg-zinc-950 text-zinc-400">
                   <tr>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Ebook</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Buyer</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Amount</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Date</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Manuscript Title</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Price</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Status</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Copies Sold</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y dark:divide-slate-800">
+                <tbody className="divide-y divide-zinc-800/80">
                   {loading ? (
                     Array.from({ length: 3 }).map((_, i) => (
-                      <tr key={i}><td colSpan={4} className="px-4 py-3"><div className="h-5 animate-pulse rounded bg-gray-100 dark:bg-slate-800" /></td></tr>
+                      <tr key={i}>
+                        <td colSpan={5} className="px-5 py-4">
+                          <div className="h-4 bg-zinc-800/60 animate-pulse" />
+                        </td>
+                      </tr>
                     ))
-                  ) : sales.length > 0 ? (
-                    sales.map((s) => (
-                      <tr key={s._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
-                        <td className="px-4 py-3 font-medium text-dark dark:text-slate-200">{s.ebookId?.title || "—"}</td>
-                        <td className="px-4 py-3 text-gray-500 dark:text-slate-400">{s.buyerId?.name || "—"}</td>
-                        <td className="px-4 py-3 font-semibold text-primary dark:text-purple-400">{formatPrice(s.amount)}</td>
-                        <td className="px-4 py-3 text-gray-500 dark:text-slate-400">{formatDate(s.purchaseDate)}</td>
+                  ) : ebooks.length > 0 ? (
+                    ebooks.map((eb) => (
+                      <tr key={eb._id} className="hover:bg-zinc-800/30 transition-colors">
+                        <td className="px-5 py-4 font-sans font-medium text-white text-sm">
+                          {eb.title}
+                        </td>
+                        <td className="px-5 py-4 text-amber-500 font-bold">{formatPrice(eb.price)}</td>
+                        <td className="px-5 py-4">
+                          <span
+                            className={cn(
+                              "inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono border",
+                              eb.status === "published"
+                                ? "border-green-500/40 bg-green-950/40 text-green-400"
+                                : "border-zinc-700 bg-zinc-800 text-zinc-400"
+                            )}
+                          >
+                            <span
+                              className={cn(
+                                "h-1.5 w-1.5",
+                                eb.status === "published" ? "bg-green-500" : "bg-zinc-500"
+                              )}
+                            />
+                            {eb.status}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4 text-zinc-300">{eb.totalSales || 0}</td>
+                        <td className="px-5 py-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Link
+                              href={`/dashboard/writer/edit/${eb._id}`}
+                              className="border border-zinc-700 bg-zinc-800/60 px-3 py-1 text-[11px] text-zinc-200 hover:border-zinc-500 hover:text-white transition-colors"
+                            >
+                              Edit
+                            </Link>
+                            <button
+                              onClick={() => handlePublishToggle(eb._id, eb.status)}
+                              className={cn(
+                                "border px-3 py-1 text-[11px] transition-colors cursor-pointer",
+                                eb.status === "published"
+                                  ? "border-amber-500/40 bg-amber-950/40 text-amber-400 hover:bg-amber-900/60"
+                                  : "border-green-500/40 bg-green-950/40 text-green-400 hover:bg-green-900/60"
+                              )}
+                            >
+                              {eb.status === "published" ? "Unpublish" : "Publish"}
+                            </button>
+                            <button
+                              onClick={() => handleDelete(eb._id)}
+                              className="border border-red-500/30 bg-red-950/30 px-3 py-1 text-[11px] text-red-400 hover:bg-red-900/50 transition-colors cursor-pointer"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     ))
                   ) : (
-                    <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-400 dark:text-slate-550">No sales yet</td></tr>
+                    <tr>
+                      <td colSpan={5} className="px-5 py-12 text-center text-zinc-500">
+                        No publications yet.{" "}
+                        <Link
+                          href="/dashboard/writer/add-ebook"
+                          className="text-amber-500 hover:text-amber-400 underline ml-1"
+                        >
+                          Publish your first ebook &rarr;
+                        </Link>
+                      </td>
+                    </tr>
                   )}
                 </tbody>
               </table>
@@ -301,18 +338,70 @@ function WriterDashboardContent() {
         </motion.div>
       )}
 
-      {/* Wishlist */}
+      {/* Sales History Tab */}
+      {activeTab === "sales" && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          <div className="border border-zinc-700/40 bg-zinc-900/60 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs font-mono">
+                <thead className="border-b border-zinc-700/50 bg-zinc-950 text-zinc-400">
+                  <tr>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Publication</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Buyer Identifier</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Gross Royalty</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Settlement Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/80">
+                  {loading ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <tr key={i}>
+                        <td colSpan={4} className="px-5 py-4">
+                          <div className="h-4 bg-zinc-800/60 animate-pulse" />
+                        </td>
+                      </tr>
+                    ))
+                  ) : sales.length > 0 ? (
+                    sales.map((s) => (
+                      <tr key={s._id} className="hover:bg-zinc-800/30 transition-colors">
+                        <td className="px-5 py-4 font-sans font-medium text-white text-sm">
+                          {s.ebookId?.title || "—"}
+                        </td>
+                        <td className="px-5 py-4 text-zinc-400">{s.buyerId?.name || s.buyerId || "—"}</td>
+                        <td className="px-5 py-4 text-amber-500 font-bold">{formatPrice(s.amount)}</td>
+                        <td className="px-5 py-4 text-zinc-400">{formatDate(s.purchaseDate)}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="px-5 py-12 text-center text-zinc-500">
+                        No sales transactions recorded yet.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Wishlist Tab */}
       {activeTab === "bookmarks" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {loadingWishlist
-              ? Array.from({ length: 6 }).map((_, i) => <EbookCardSkeleton key={i} />)
-              : wishlist.length > 0
-                ? wishlist.map((item, i) => {
-                    const ebook = item.ebookId || item;
-                    return <EbookCard key={item._id || ebook._id} ebook={ebook} index={i} />;
-                  })
-                : <p className="col-span-full py-12 text-center text-gray-400 dark:text-slate-500">No items in wishlist</p>}
+            {loadingWishlist ? (
+              Array.from({ length: 6 }).map((_, i) => <EbookCardSkeleton key={i} />)
+            ) : wishlist.length > 0 ? (
+              wishlist.map((item, i) => {
+                const ebook = item.ebookId || item;
+                return <EbookCard key={item._id || ebook._id} ebook={ebook} index={i} />;
+              })
+            ) : (
+              <div className="col-span-full border border-zinc-800 bg-zinc-900/40 p-12 text-center text-zinc-500 font-mono text-xs">
+                No bookmarked items in your wishlist.
+              </div>
+            )}
           </div>
         </motion.div>
       )}
@@ -322,11 +411,13 @@ function WriterDashboardContent() {
 
 export default function WriterDashboard() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex min-h-[60vh] items-center justify-center bg-zinc-950">
+          <LoadingSpinner size="lg" />
+        </div>
+      }
+    >
       <WriterDashboardContent />
     </Suspense>
   );

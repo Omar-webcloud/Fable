@@ -2,78 +2,117 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Heart, BookOpen } from "lucide-react";
 import { formatPrice } from "@/utils";
 import { useWishlist } from "@/providers/WishlistProvider";
+import { cn } from "@/lib/utils";
 
 export default function EbookCard({ ebook, index = 0, purchased = false }) {
   const { isWishlisted, toggleWishlist } = useWishlist();
   const wishlisted = isWishlisted(ebook._id);
+  const ebookIsFree = Boolean(ebook?.isFree || Number(ebook?.price) === 0);
 
   const handleWishlistClick = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     toggleWishlist(ebook._id);
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-20px" }}
-      transition={{ duration: 0.5, delay: (index % 3) * 0.1, ease: "easeOut" }}
-      whileHover={{ y: -6, scale: 1.02 }}
-      className="h-full"
+      transition={{ duration: 0.4, delay: (index % 3) * 0.08, ease: "easeOut" }}
+      whileHover={{ y: -4 }}
+      className="h-full group"
     >
-      <Link href={`/ebooks/${ebook._id}`} className="group block h-full">
-        <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm transition-shadow duration-300 hover:shadow-lg h-full flex flex-col">
-          <div className="relative h-52 overflow-hidden bg-gradient-to-br from-purple-50 to-violet-100 dark:from-slate-800 dark:to-slate-950 shrink-0">
-            {/* Wishlist Heart Toggle */}
+      <Link href={`/ebooks/${ebook._id}`} className="block h-full">
+        <div className="flex h-full flex-col border border-zinc-700/30 bg-zinc-900/60 hover:bg-zinc-800/50 hover:border-zinc-500/50 transition-all duration-300 shadow-sm relative overflow-hidden">
+          {/* Cover Media Container */}
+          <div className="relative h-60 w-full overflow-hidden bg-zinc-950 border-b border-zinc-700/30">
+            {/* Wishlist Toggle Button */}
             <button
               type="button"
               onClick={handleWishlistClick}
-              className="absolute right-2 top-2 z-10 rounded-full bg-white/80 p-2 text-gray-500 dark:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-white hover:text-red-500 hover:shadow-md active:scale-95 dark:bg-slate-950/80 dark:hover:bg-slate-900 dark:hover:text-red-500 shadow-sm"
+              className={cn(
+                "absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center border transition-all duration-200 cursor-pointer backdrop-blur-md",
+                wishlisted
+                  ? "border-red-500/60 bg-red-950/80 text-red-400"
+                  : "border-zinc-700/60 bg-zinc-900/80 text-zinc-400 hover:border-zinc-500 hover:text-white"
+              )}
               aria-label="Toggle Wishlist"
             >
-              <svg className="h-5 w-5" fill={wishlisted ? "#EF4444" : "none"} stroke={wishlisted ? "#EF4444" : "currentColor"} strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-              </svg>
+              <Heart
+                className={cn("h-4 w-4", wishlisted && "fill-red-500 text-red-500")}
+              />
             </button>
 
+            {/* Purchased or Free Badge */}
+            {ebookIsFree ? (
+              <div className="absolute left-3 top-3 z-20 flex items-center gap-1.5 border border-emerald-500/50 bg-emerald-950/80 px-2.5 py-1 text-[11px] font-mono uppercase tracking-wider text-emerald-400 backdrop-blur-md">
+                <div className="h-1.5 w-1.5 bg-emerald-400" />
+                <span>Free Read</span>
+              </div>
+            ) : purchased ? (
+              <div className="absolute left-3 top-3 z-20 flex items-center gap-1.5 border border-amber-500/40 bg-zinc-900/90 px-2.5 py-1 text-[11px] font-medium text-amber-400 backdrop-blur-md">
+                <div className="h-1.5 w-1.5 bg-amber-500" />
+                <span>Purchased</span>
+              </div>
+            ) : null}
+
+            {/* Image / Fallback */}
             {ebook.coverImage ? (
               <img
                 src={ebook.coverImage}
                 alt={ebook.title}
-                className="h-full w-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:rotate-1"
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             ) : (
-              <div className="flex h-full items-center justify-center">
-                <svg className="h-16 w-16 text-purple-200 dark:text-purple-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                </svg>
+              <div className="flex h-full w-full flex-col items-center justify-center bg-zinc-950 p-6 text-zinc-600">
+                <BookOpen className="h-12 w-12 text-zinc-700 mb-2 stroke-[1.2]" />
+                <span className="text-xs uppercase tracking-wider text-zinc-500 font-mono">Fable Original</span>
               </div>
             )}
-            {purchased && (
-              <span className="absolute left-2 top-2 rounded-full bg-green-500 px-3 py-1 text-xs font-bold text-white shadow-md">
-                Purchased
-              </span>
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+
+            {/* Subtle gradient vignette */}
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-black/20 pointer-events-none" />
           </div>
-          <div className="p-4 flex-1 flex flex-col justify-between">
-            <div>
-              <h3 className="line-clamp-1 font-semibold text-dark dark:text-white transition-colors duration-300 group-hover:text-primary dark:group-hover:text-purple-400">
+
+          {/* Card Body */}
+          <div className="flex flex-1 flex-col justify-between p-5">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                  {ebook.genre || "General"}
+                </span>
+                <span
+                  className={cn(
+                    "text-sm font-medium font-mono",
+                    ebookIsFree ? "text-emerald-400 font-bold" : "text-amber-500"
+                  )}
+                >
+                  {ebookIsFree ? "FREE" : formatPrice(ebook.price)}
+                </span>
+              </div>
+
+              <h3 className="font-normal text-lg tracking-tight text-white group-hover:text-amber-400 transition-colors line-clamp-1">
                 {ebook.title}
               </h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">{ebook.writerName}</p>
+
+              <p className="text-xs text-zinc-400">
+                By <span className="text-zinc-300 font-medium">{ebook.writerName || "Independent Author"}</span>
+              </p>
             </div>
-            <div className="mt-3 flex items-center justify-between">
-              <span className="text-lg font-bold text-primary dark:text-purple-400">
-                {formatPrice(ebook.price)}
+
+            {/* Footer metadata */}
+            <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500">
+              <span className="group-hover:text-zinc-300 transition-colors flex items-center gap-1">
+                View Details &rarr;
               </span>
-              {ebook.genre && (
-                <span className="rounded-full bg-purple-50 dark:bg-purple-950/40 px-2.5 py-0.5 text-xs font-medium text-primary dark:text-purple-300">
-                  {ebook.genre}
-                </span>
-              )}
+              <span className="font-mono text-[11px] text-zinc-500">
+                {ebook.salesCount ? `${ebook.salesCount} sold` : "Instant Access"}
+              </span>
             </div>
           </div>
         </div>

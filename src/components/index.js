@@ -8,3 +8,6 @@ export { MonthlySalesChart, GenreDistributionChart } from "./Charts";
 export { default as EbookCard } from "./EbookCard";
 export { default as DashboardSidebar } from "./DashboardSidebar";
 export { default as ThemeToggle } from "./ThemeToggle";
+export { Button } from "./ui/button";
+export { SectionBadge, BlurHeading, SectionHeader } from "./ui/SectionHeader";
+export { LogoCloud } from "./ui/LogoCloud";

@@ -11,12 +11,15 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import SkeletonLoader, { TableRowSkeleton } from "@/components/SkeletonLoader";
 import { formatPrice, formatDate } from "@/utils";
 import { ROLES } from "@/constants";
+import { SectionBadge } from "@/components/ui/SectionHeader";
+import { BarChart3, Users, BookOpen, CreditCard, ChevronDown, Trash2, Check, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const tabs = [
-  { key: "overview", label: "Analytics" },
-  { key: "users", label: "Manage Users" },
-  { key: "ebooks", label: "Manage Ebooks" },
-  { key: "transactions", label: "Transactions" },
+  { key: "overview", label: "Analytics Overview", icon: BarChart3 },
+  { key: "users", label: "Manage Users", icon: Users },
+  { key: "ebooks", label: "Manage Ebooks", icon: BookOpen },
+  { key: "transactions", label: "Transactions", icon: CreditCard },
 ];
 
 function AdminDashboardContent() {
@@ -26,7 +29,6 @@ function AdminDashboardContent() {
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "overview");
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Keep state in sync with URL search params (desktop sidebar clicks)
   useEffect(() => {
     const tab = searchParams.get("tab") || "overview";
     setActiveTab(tab);
@@ -73,17 +75,20 @@ function AdminDashboardContent() {
       })
       .finally(() => setLoadingOverview(false));
 
-    adminService.getTransactions()
+    adminService
+      .getTransactions()
       .then((res) => setTransactions(res.data || []))
       .catch(() => {})
       .finally(() => setLoadingTransactions(false));
 
-    adminService.getEbooks()
+    adminService
+      .getEbooks()
       .then((res) => setEbooks(res.data || []))
       .catch(() => {})
       .finally(() => setLoadingEbooks(false));
 
-    userService.getAll()
+    userService
+      .getAll()
       .then((res) => setUsers(res.data || []))
       .catch(() => {})
       .finally(() => setLoadingUsers(false));
@@ -92,21 +97,21 @@ function AdminDashboardContent() {
   const handleRoleChange = async (userId, newRole) => {
     try {
       await userService.changeRole(userId, newRole);
-      setUsers((prev) => prev.map((u) => u._id === userId ? { ...u, role: newRole } : u));
-      toast.success("Role updated");
+      setUsers((prev) => prev.map((u) => (u._id === userId ? { ...u, role: newRole } : u)));
+      toast.success("User privilege role updated");
     } catch (err) {
-      toast.error(err.response?.data?.error || "Failed to change role");
+      toast.error(err.response?.data?.error || "Failed to alter role");
     }
   };
 
   const handleDeleteUser = async (userId) => {
-    if (!confirm("Delete this user?")) return;
+    if (!confirm("Permanently purge this user account?")) return;
     try {
       await userService.deleteUser(userId);
       setUsers((prev) => prev.filter((u) => u._id !== userId));
-      toast.success("User deleted");
+      toast.success("User account deleted");
     } catch (err) {
-      toast.error(err.response?.data?.error || "Failed to delete");
+      toast.error(err.response?.data?.error || "Failed to purge user");
     }
   };
 
@@ -118,45 +123,56 @@ function AdminDashboardContent() {
         await ebookService.publish(ebookId);
       }
       setEbooks((prev) =>
-        prev.map((e) => e._id === ebookId ? { ...e, status: status === "published" ? "unpublished" : "published" } : e)
+        prev.map((e) =>
+          e._id === ebookId
+            ? { ...e, status: status === "published" ? "unpublished" : "published" }
+            : e
+        )
       );
-      toast.success("Status updated");
+      toast.success("Publication status toggled");
     } catch (err) {
-      toast.error(err.response?.data?.error || "Failed");
+      toast.error(err.response?.data?.error || "Status update failed");
     }
   };
 
   const handleDeleteEbook = async (ebookId) => {
-    if (!confirm("Delete this ebook?")) return;
+    if (!confirm("Permanently delete this ebook from catalog?")) return;
     try {
       await ebookService.delete(ebookId);
       setEbooks((prev) => prev.filter((e) => e._id !== ebookId));
-      toast.success("Ebook deleted");
+      toast.success("Ebook removed from system");
     } catch (err) {
-      toast.error(err.response?.data?.error || "Failed");
+      toast.error(err.response?.data?.error || "Failed to delete ebook");
     }
   };
 
   return (
-    <div>
-      <h1 className="mb-6 text-2xl font-bold text-dark dark:text-white">Admin Dashboard</h1>
+    <div className="space-y-8">
+      {/* Title & Badge */}
+      <div className="space-y-2 border-b border-zinc-800 pb-6">
+        <SectionBadge>Platform Telemetry</SectionBadge>
+        <h1 className="text-3xl font-normal tracking-tight text-white">System Administration</h1>
+        <p className="text-xs text-zinc-400">
+          Global platform analytics, user privilege management, content moderation, and Stripe transaction logs.
+        </p>
+      </div>
 
-      {/* Tab Navigation (mobile) */}
-      <div className="relative mb-6 lg:hidden">
+      {/* Mobile Tab Navigation */}
+      <div className="relative lg:hidden">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="flex w-full items-center justify-between rounded-lg border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-slate-200 shadow-sm focus:outline-none"
+          className="flex w-full items-center justify-between border border-zinc-700 bg-zinc-900 px-4 py-3 text-xs font-mono uppercase tracking-wider text-white"
         >
           <span>{tabs.find((t) => t.key === activeTab)?.label || "Menu"}</span>
-          <svg className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${menuOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+          <ChevronDown
+            className={`h-4 w-4 text-zinc-400 transition-transform ${menuOpen ? "rotate-180" : ""}`}
+          />
         </button>
 
         {menuOpen && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-            <div className="absolute left-0 right-0 z-20 mt-1 rounded-lg border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-1 shadow-lg">
+            <div className="absolute left-0 right-0 z-20 mt-1 border border-zinc-700 bg-zinc-900 shadow-2xl">
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
@@ -165,11 +181,12 @@ function AdminDashboardContent() {
                     router.push(`?tab=${tab.key}`, { scroll: false });
                     setMenuOpen(false);
                   }}
-                  className={`flex w-full items-center px-4 py-2.5 text-sm font-medium transition ${
+                  className={cn(
+                    "flex w-full items-center px-4 py-3 text-xs font-mono uppercase tracking-wider transition-colors",
                     activeTab === tab.key
-                      ? "bg-primary/10 text-primary dark:bg-primary/20 dark:text-purple-400"
-                      : "text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-900"
-                  }`}
+                      ? "bg-zinc-800 text-amber-500 font-bold"
+                      : "text-zinc-400 hover:bg-zinc-800/60 hover:text-white"
+                  )}
                 >
                   {tab.label}
                 </button>
@@ -179,154 +196,152 @@ function AdminDashboardContent() {
         )}
       </div>
 
-      {/* Analytics Overview */}
+      {/* Analytics Overview Tab */}
       {activeTab === "overview" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          {/* Stats Cards */}
-          <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+          {/* 4 Stats Cards */}
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              { label: "Total Users", value: stats?.totalUsers, color: "text-primary dark:text-purple-400", bg: "bg-purple-50 dark:bg-purple-950/40" },
-              { label: "Total Writers", value: stats?.totalWriters, color: "text-secondary dark:text-purple-300", bg: "bg-violet-50 dark:bg-violet-950/40" },
-              { label: "Ebooks Sold", value: stats?.totalEbooksSold, color: "text-accent dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-950/30" },
-              { label: "Revenue", value: stats !== null ? formatPrice(stats?.totalRevenue ?? 0) : null, color: "text-green-600 dark:text-green-400", bg: "bg-green-50 dark:bg-green-950/30" },
+              {
+                label: "Registered Users",
+                value: stats?.totalUsers,
+                color: "text-white",
+                desc: "Total platform accounts",
+              },
+              {
+                label: "Active Authors",
+                value: stats?.totalWriters,
+                color: "text-sky-400",
+                desc: "Writers with published works",
+              },
+              {
+                label: "Ebooks Transacted",
+                value: stats?.totalEbooksSold,
+                color: "text-amber-500",
+                desc: "Cumulative copies sold",
+              },
+              {
+                label: "Gross Platform Revenue",
+                value: stats !== null ? formatPrice(stats?.totalRevenue ?? 0) : null,
+                color: "text-emerald-400",
+                desc: "Total settlement volume",
+              },
             ].map((card, i) => (
-              <motion.div
+              <div
                 key={card.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className={`rounded-xl ${card.bg} p-5`}
+                className="border border-zinc-700/40 bg-zinc-900/60 p-6 space-y-2"
               >
-                <p className="text-sm font-medium text-gray-600 dark:text-slate-300">{card.label}</p>
+                <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                  {card.label}
+                </div>
                 {loadingOverview ? (
-                  <SkeletonLoader className="mt-2 h-8 w-24" />
+                  <SkeletonLoader className="h-8 w-24 my-1" />
                 ) : (
-                  <p className={`mt-1 text-3xl font-bold ${card.color}`}>{card.value ?? 0}</p>
+                  <div className={`text-3xl font-mono font-medium ${card.color}`}>
+                    {card.value ?? 0}
+                  </div>
                 )}
-              </motion.div>
+                <div className="text-[11px] text-zinc-500">{card.desc}</div>
+              </div>
             ))}
           </div>
 
-          {/* Charts */}
+          {/* Charts Row */}
           <div className="grid gap-6 xl:grid-cols-2">
-            <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-6 shadow-sm">
-              <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Monthly Sales</h3>
+            <div className="border border-zinc-700/40 bg-zinc-900/60 p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <h3 className="text-sm font-medium uppercase tracking-wider font-mono text-zinc-300">
+                  Monthly Transaction Trajectory
+                </h3>
+                <span className="text-xs font-mono text-amber-500">Live Metric</span>
+              </div>
               {loadingOverview ? (
-                <div className="flex h-64 flex-col justify-end gap-2 pb-4">
-                  <div className="flex items-end gap-4 h-full px-4">
-                    <SkeletonLoader className="h-1/3 w-full" />
-                    <SkeletonLoader className="h-2/3 w-full" />
-                    <SkeletonLoader className="h-1/2 w-full" />
-                    <SkeletonLoader className="h-3/4 w-full" />
-                    <SkeletonLoader className="h-full w-full" />
-                    <SkeletonLoader className="h-1/4 w-full" />
-                  </div>
-                </div>
+                <div className="h-72 bg-zinc-950 animate-pulse" />
               ) : monthlySales.length > 0 ? (
                 <MonthlySalesChart data={monthlySales} />
               ) : (
-                <div className="flex h-64 items-center justify-center text-gray-400 dark:text-slate-500">No sales data yet</div>
+                <div className="flex h-72 items-center justify-center text-xs font-mono text-zinc-500">
+                  No monthly trajectory records available.
+                </div>
               )}
             </div>
-            <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-6 shadow-sm">
-              <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Genre Distribution</h3>
+
+            <div className="border border-zinc-700/40 bg-zinc-900/60 p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <h3 className="text-sm font-medium uppercase tracking-wider font-mono text-zinc-300">
+                  Taxonomy Distribution
+                </h3>
+                <span className="text-xs font-mono text-sky-400">By Catalog Share</span>
+              </div>
               {loadingOverview ? (
-                <div className="flex h-64 items-center justify-center">
-                  <SkeletonLoader className="h-48 w-48 rounded-full" />
-                </div>
+                <div className="h-72 bg-zinc-950 animate-pulse" />
               ) : genreData.length > 0 ? (
                 <GenreDistributionChart data={genreData} />
               ) : (
-                <div className="flex h-64 items-center justify-center text-gray-400 dark:text-slate-500">No ebook data yet</div>
+                <div className="flex h-72 items-center justify-center text-xs font-mono text-zinc-500">
+                  No publication data available.
+                </div>
               )}
             </div>
           </div>
         </motion.div>
       )}
 
-      {/* Manage Users */}
+      {/* Manage Users Tab */}
       {activeTab === "users" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          {/* Card list for Mobile */}
-          <div className="space-y-4 sm:hidden">
-            {loadingUsers ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="animate-pulse rounded-xl border dark:border-slate-800 bg-white dark:bg-slate-950 p-4 space-y-3">
-                  <div className="h-5 w-2/3 rounded bg-gray-100 dark:bg-slate-800" />
-                  <div className="h-4 w-1/2 rounded bg-gray-100 dark:bg-slate-800" />
-                  <div className="h-4 w-1/3 rounded bg-gray-100 dark:bg-slate-800" />
-                </div>
-              ))
-            ) : users.length > 0 ? (
-              users.map((u) => (
-                <div key={u._id} className="rounded-xl border dark:border-slate-800 bg-white dark:bg-slate-950 p-4 shadow-sm space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h4 className="font-semibold text-dark dark:text-slate-200">{u.name}</h4>
-                      <p className="text-xs text-gray-500 dark:text-slate-400">{u.email}</p>
-                    </div>
-                    <button
-                      onClick={() => handleDeleteUser(u._id)}
-                      className="rounded bg-red-50 dark:bg-red-950/30 px-2.5 py-1 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 shrink-0"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-3 pt-2 border-t dark:border-slate-800">
-                    <span className="text-xs text-gray-400 font-medium">Role:</span>
-                    <select
-                      value={u.role}
-                      onChange={(e) => handleRoleChange(u._id, e.target.value)}
-                      className="rounded border border-gray-300 dark:border-slate-800 px-2 py-1 text-xs outline-none focus:border-primary bg-white dark:bg-slate-900 text-dark dark:text-slate-100"
-                    >
-                      {Object.values(ROLES).map((r) => (
-                        <option key={r} value={r}>
-                          {r}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="rounded-xl border dark:border-slate-800 bg-white dark:bg-slate-950 p-6 text-center text-gray-400">No users found</div>
-            )}
-          </div>
-
-          {/* Desktop Table View */}
-          <div className="hidden sm:block rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 shadow-sm overflow-hidden">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          <div className="border border-zinc-700/40 bg-zinc-900/60 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50">
+              <table className="w-full text-left text-xs font-mono">
+                <thead className="border-b border-zinc-700/50 bg-zinc-950 text-zinc-400">
                   <tr>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Name</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Email</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Role</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Actions</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">User Legal Name</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Email Address</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Privilege Tier</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y dark:divide-slate-800">
+                <tbody className="divide-y divide-zinc-800/80">
                   {loadingUsers ? (
                     Array.from({ length: 5 }).map((_, i) => (
                       <TableRowSkeleton key={i} cols={4} />
                     ))
-                  ) : users.length > 0 ? users.map((u) => (
-                    <tr key={u._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
-                      <td className="px-4 py-3 font-medium text-dark dark:text-slate-200">{u.name}</td>
-                      <td className="px-4 py-3 text-gray-500 dark:text-slate-400">{u.email}</td>
-                      <td className="px-4 py-3">
-                        <select value={u.role} onChange={(e) => handleRoleChange(u._id, e.target.value)}
-                          className="rounded border border-gray-300 dark:border-slate-800 px-2 py-1 text-sm outline-none focus:border-primary bg-white dark:bg-slate-900 text-dark dark:text-slate-100">
-                          {Object.values(ROLES).map((r) => <option key={r} value={r}>{r}</option>)}
-                        </select>
-                      </td>
-                      <td className="px-4 py-3">
-                        <button onClick={() => handleDeleteUser(u._id)}
-                          className="rounded bg-red-50 dark:bg-red-950/30 px-2.5 py-1 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50">Delete</button>
+                  ) : users.length > 0 ? (
+                    users.map((u) => (
+                      <tr key={u._id} className="hover:bg-zinc-800/30 transition-colors">
+                        <td className="px-5 py-4 font-sans font-medium text-white text-sm">
+                          {u.name}
+                        </td>
+                        <td className="px-5 py-4 text-zinc-400">{u.email}</td>
+                        <td className="px-5 py-4">
+                          <select
+                            value={u.role}
+                            onChange={(e) => handleRoleChange(u._id, e.target.value)}
+                            className="border border-zinc-700 bg-zinc-950 px-2.5 py-1 text-xs text-amber-500 outline-none focus:border-amber-400 cursor-pointer font-mono"
+                          >
+                            {Object.values(ROLES).map((r) => (
+                              <option key={r} value={r}>
+                                {r.toUpperCase()}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="px-5 py-4 text-right">
+                          <button
+                            onClick={() => handleDeleteUser(u._id)}
+                            className="border border-red-500/30 bg-red-950/30 px-3 py-1 text-[11px] text-red-400 hover:bg-red-900/50 transition-colors cursor-pointer"
+                          >
+                            Purge User
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="px-5 py-12 text-center text-zinc-500">
+                        No user accounts located.
                       </td>
                     </tr>
-                  )) : (
-                    <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-400 dark:text-slate-550">No users found</td></tr>
                   )}
                 </tbody>
               </table>
@@ -335,96 +350,81 @@ function AdminDashboardContent() {
         </motion.div>
       )}
 
-      {/* Manage Ebooks */}
+      {/* Manage Ebooks Tab */}
       {activeTab === "ebooks" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          {/* Card list for Mobile */}
-          <div className="space-y-4 sm:hidden">
-            {loadingEbooks ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="animate-pulse rounded-xl border dark:border-slate-800 bg-white dark:bg-slate-950 p-4 space-y-3">
-                  <div className="h-5 w-2/3 rounded bg-gray-100 dark:bg-slate-800" />
-                  <div className="h-4 w-1/2 rounded bg-gray-100 dark:bg-slate-800" />
-                  <div className="h-4 w-1/3 rounded bg-gray-100 dark:bg-slate-800" />
-                </div>
-              ))
-            ) : ebooks.length > 0 ? (
-              ebooks.map((eb) => (
-                <div key={eb._id} className="rounded-xl border dark:border-slate-800 bg-white dark:bg-slate-950 p-4 shadow-sm space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h4 className="font-semibold text-dark dark:text-slate-200">{eb.title}</h4>
-                      <p className="text-xs text-gray-500 dark:text-slate-400">by {eb.writerName}</p>
-                    </div>
-                    <span className="font-bold text-primary dark:text-purple-400 shrink-0">{formatPrice(eb.price)}</span>
-                  </div>
-                  <div className="flex items-center justify-between gap-2 pt-2 border-t dark:border-slate-800">
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${eb.status === "published" ? "bg-green-50 text-green-600 dark:bg-green-950/30 dark:text-green-400" : "bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400"}`}>
-                      {eb.status}
-                    </span>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handlePublishToggle(eb._id, eb.status)}
-                        className={`rounded px-2.5 py-1 text-xs font-medium ${eb.status === "published" ? "bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50" : "bg-green-50 dark:bg-green-950/30 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50"}`}
-                      >
-                        {eb.status === "published" ? "Unpublish" : "Publish"}
-                      </button>
-                      <button
-                        onClick={() => handleDeleteEbook(eb._id)}
-                        className="rounded bg-red-50 dark:bg-red-950/30 px-2.5 py-1 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="rounded-xl border dark:border-slate-800 bg-white dark:bg-slate-950 p-6 text-center text-gray-400">No ebooks found</div>
-            )}
-          </div>
-
-          {/* Desktop Table View */}
-          <div className="hidden sm:block rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 shadow-sm overflow-hidden">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          <div className="border border-zinc-700/40 bg-zinc-900/60 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50">
+              <table className="w-full text-left text-xs font-mono min-w-[700px]">
+                <thead className="border-b border-zinc-700/50 bg-zinc-950 text-zinc-400">
                   <tr>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Title</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Writer</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Price</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Status</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Actions</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Manuscript Title</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Author</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Price</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Status</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider text-right">Moderation Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y dark:divide-slate-800">
+                <tbody className="divide-y divide-zinc-800/80">
                   {loadingEbooks ? (
                     Array.from({ length: 5 }).map((_, i) => (
                       <TableRowSkeleton key={i} cols={5} />
                     ))
-                  ) : ebooks.length > 0 ? ebooks.map((eb) => (
-                    <tr key={eb._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
-                      <td className="px-4 py-3 font-medium text-dark dark:text-slate-200">{eb.title}</td>
-                      <td className="px-4 py-3 text-gray-500 dark:text-slate-400">{eb.writerName}</td>
-                      <td className="px-4 py-3 font-semibold text-primary dark:text-purple-400">{formatPrice(eb.price)}</td>
-                      <td className="px-4 py-3">
-                        <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${eb.status === "published" ? "bg-green-50 text-green-600 dark:bg-green-950/30 dark:text-green-400" : "bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400"}`}>
-                          {eb.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex gap-2">
-                          <button onClick={() => handlePublishToggle(eb._id, eb.status)}
-                            className={`rounded px-2.5 py-1 text-xs font-medium ${eb.status === "published" ? "bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50" : "bg-green-50 dark:bg-green-950/30 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50"}`}>
-                            {eb.status === "published" ? "Unpublish" : "Publish"}
-                          </button>
-                          <button onClick={() => handleDeleteEbook(eb._id)}
-                            className="rounded bg-red-50 dark:bg-red-950/30 px-2.5 py-1 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50">Delete</button>
-                        </div>
+                  ) : ebooks.length > 0 ? (
+                    ebooks.map((eb) => (
+                      <tr key={eb._id} className="hover:bg-zinc-800/30 transition-colors">
+                        <td className="px-5 py-4 font-sans font-medium text-white text-sm">
+                          {eb.title}
+                        </td>
+                        <td className="px-5 py-4 text-zinc-400">{eb.writerName}</td>
+                        <td className="px-5 py-4 text-amber-500 font-bold">{formatPrice(eb.price)}</td>
+                        <td className="px-5 py-4">
+                          <span
+                            className={cn(
+                              "inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono border",
+                              eb.status === "published"
+                                ? "border-green-500/40 bg-green-950/40 text-green-400"
+                                : "border-zinc-700 bg-zinc-800 text-zinc-400"
+                            )}
+                          >
+                            <span
+                              className={cn(
+                                "h-1.5 w-1.5",
+                                eb.status === "published" ? "bg-green-500" : "bg-zinc-500"
+                              )}
+                            />
+                            {eb.status}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handlePublishToggle(eb._id, eb.status)}
+                              className={cn(
+                                "border px-3 py-1 text-[11px] transition-colors cursor-pointer",
+                                eb.status === "published"
+                                  ? "border-amber-500/40 bg-amber-950/40 text-amber-400 hover:bg-amber-900/60"
+                                  : "border-green-500/40 bg-green-950/40 text-green-400 hover:bg-green-900/60"
+                              )}
+                            >
+                              {eb.status === "published" ? "Unpublish" : "Publish"}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteEbook(eb._id)}
+                              className="border border-red-500/30 bg-red-950/30 px-3 py-1 text-[11px] text-red-400 hover:bg-red-900/50 transition-colors cursor-pointer"
+                            >
+                              Purge
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="px-5 py-12 text-center text-zinc-500">
+                        No publications in catalog.
                       </td>
                     </tr>
-                  )) : (
-                    <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400 dark:text-slate-550">No ebooks found</td></tr>
                   )}
                 </tbody>
               </table>
@@ -433,74 +433,46 @@ function AdminDashboardContent() {
         </motion.div>
       )}
 
-      {/* Transactions */}
+      {/* Transactions Tab */}
       {activeTab === "transactions" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          {/* Card list for Mobile */}
-          <div className="space-y-4 sm:hidden">
-            {loadingTransactions ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="animate-pulse rounded-xl border dark:border-slate-800 bg-white dark:bg-slate-950 p-4 space-y-3">
-                  <div className="h-5 w-2/3 rounded bg-gray-100 dark:bg-slate-800" />
-                  <div className="h-4 w-1/2 rounded bg-gray-100 dark:bg-slate-800" />
-                  <div className="h-4 w-1/3 rounded bg-gray-100 dark:bg-slate-800" />
-                </div>
-              ))
-            ) : transactions.length > 0 ? (
-              transactions.map((tx) => (
-                <div key={tx._id} className="rounded-xl border dark:border-slate-800 bg-white dark:bg-slate-950 p-4 shadow-sm space-y-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <p className="font-mono text-[10px] text-gray-400">ID: {tx._id}</p>
-                      <p className="text-sm font-semibold text-dark dark:text-slate-200 mt-0.5">{tx.email}</p>
-                    </div>
-                    <span className="font-bold text-primary dark:text-purple-400 shrink-0">{formatPrice(tx.amount)}</span>
-                  </div>
-                  <div className="flex items-center justify-between gap-2 pt-2 border-t dark:border-slate-800">
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${tx.type === "purchase" ? "bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400" : "bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-300"}`}>
-                      {tx.type}
-                    </span>
-                    <span className="text-xs text-gray-500 dark:text-slate-400">{formatDate(tx.date || tx.createdAt)}</span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="rounded-xl border dark:border-slate-800 bg-white dark:bg-slate-950 p-6 text-center text-gray-400">No transactions yet</div>
-            )}
-          </div>
-
-          {/* Desktop Table View */}
-          <div className="hidden sm:block rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 shadow-sm overflow-hidden">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          <div className="border border-zinc-700/40 bg-zinc-900/60 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50">
+              <table className="w-full text-left text-xs font-mono">
+                <thead className="border-b border-zinc-700/50 bg-zinc-950 text-zinc-400">
                   <tr>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Transaction ID</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Type</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Email</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Amount</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Date</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Transaction Hash ID</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Type</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Payer Account</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Amount</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Timestamp</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y dark:divide-slate-800">
+                <tbody className="divide-y divide-zinc-800/80">
                   {loadingTransactions ? (
                     Array.from({ length: 5 }).map((_, i) => (
                       <TableRowSkeleton key={i} cols={5} />
                     ))
-                  ) : transactions.length > 0 ? transactions.map((tx) => (
-                    <tr key={tx._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
-                      <td className="px-4 py-3 font-mono text-xs text-gray-500 dark:text-slate-400">{tx._id}</td>
-                      <td className="px-4 py-3">
-                        <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${tx.type === "purchase" ? "bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400" : "bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-300"}`}>
-                          {tx.type}
-                        </span>
+                  ) : transactions.length > 0 ? (
+                    transactions.map((tx) => (
+                      <tr key={tx._id} className="hover:bg-zinc-800/30 transition-colors">
+                        <td className="px-5 py-4 font-mono text-[11px] text-zinc-400">{tx._id}</td>
+                        <td className="px-5 py-4">
+                          <span className="border border-zinc-700 bg-zinc-950 px-2 py-0.5 text-[10px] uppercase tracking-wider text-amber-500 font-mono">
+                            {tx.type || "PURCHASE"}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4 text-zinc-300">{tx.email}</td>
+                        <td className="px-5 py-4 text-amber-500 font-bold">{formatPrice(tx.amount)}</td>
+                        <td className="px-5 py-4 text-zinc-400">{formatDate(tx.date || tx.createdAt)}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="px-5 py-12 text-center text-zinc-500">
+                        No transactions recorded in ledger.
                       </td>
-                      <td className="px-4 py-3 text-gray-500 dark:text-slate-400">{tx.email}</td>
-                      <td className="px-4 py-3 font-semibold text-primary dark:text-purple-400">{formatPrice(tx.amount)}</td>
-                      <td className="px-4 py-3 text-gray-500 dark:text-slate-400">{formatDate(tx.date || tx.createdAt)}</td>
                     </tr>
-                  )) : (
-                    <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400 dark:text-slate-550">No transactions yet</td></tr>
                   )}
                 </tbody>
               </table>
@@ -514,11 +486,13 @@ function AdminDashboardContent() {
 
 export default function AdminDashboard() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex min-h-[60vh] items-center justify-center bg-zinc-950">
+          <LoadingSpinner size="lg" />
+        </div>
+      }
+    >
       <AdminDashboardContent />
     </Suspense>
   );

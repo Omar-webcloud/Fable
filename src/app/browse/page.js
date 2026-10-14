@@ -2,12 +2,15 @@
 
 import { Suspense, useEffect, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { Search, SlidersHorizontal, X, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import EbookCard from "@/components/EbookCard";
-import { EbookCardSkeleton, SkeletonLoader } from "@/components/SkeletonLoader";
+import { EbookCardSkeleton } from "@/components/SkeletonLoader";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { SectionBadge, BlurHeading } from "@/components/ui/SectionHeader";
 import { ebookService } from "@/services";
 import { GENRES, SORT_OPTIONS } from "@/constants";
 import { useDebounce } from "@/hooks";
+import { cn } from "@/lib/utils";
 
 function BrowseContent() {
   const searchParams = useSearchParams();
@@ -35,7 +38,11 @@ function BrowseContent() {
       if (genre) params.genre = genre;
       if (minPrice) params.minPrice = minPrice;
       if (maxPrice) params.maxPrice = maxPrice;
-      if (availability) params.availability = availability;
+      if (availability === "free") {
+        params.maxPrice = 0;
+      } else if (availability) {
+        params.availability = availability;
+      }
 
       const res = await ebookService.getAll(params);
       setEbooks(res.data.ebooks || []);
@@ -55,154 +62,208 @@ function BrowseContent() {
     setPage(1);
   }, [debouncedSearch, genre, sort, minPrice, maxPrice, availability]);
 
+  const hasActiveFilters = Boolean(search || genre || minPrice || maxPrice || availability || sort !== "newest");
+
+  const clearFilters = () => {
+    setSearch("");
+    setGenre("");
+    setMinPrice("");
+    setMaxPrice("");
+    setAvailability("");
+    setSort("newest");
+  };
+
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12">
-      <h1 className="mb-8 text-3xl font-bold text-dark dark:text-white">Browse Ebooks</h1>
+    <div className="w-full bg-zinc-950 text-white min-h-screen py-16 px-6 md:px-12 lg:px-16">
+      <div className="mx-auto max-w-7xl">
+        {/* Header */}
+        <div className="mb-12 space-y-4">
+          <SectionBadge>Curated Catalog</SectionBadge>
+          <BlurHeading
+            text="Explore the Fable Library"
+            className="text-3xl sm:text-4xl md:text-5xl font-normal"
+          />
+          <p className="text-zinc-400 text-sm sm:text-base max-w-xl">
+            Search thousands of original publications by independent writers. Filter by genre, pricing, and availability.
+          </p>
+        </div>
 
-      {/* Filters */}
-      <div className="mb-8 rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-4 shadow-sm">
-        <div className="flex flex-col gap-4 md:flex-row">
-          <div className="relative flex-1">
-            <svg className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-            <input
-              type="search"
-              placeholder="Search by title or writer..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-slate-800 py-2 pl-10 pr-4 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white dark:bg-slate-900 text-dark dark:text-white"
-            />
+        {/* Technical Filter Box */}
+        <div className="mb-10 border border-zinc-700/40 bg-zinc-900/80 p-6 backdrop-blur-md space-y-4">
+          <div className="flex flex-col gap-4 lg:flex-row">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+              <input
+                type="search"
+                placeholder="Search by title, writer, or synopsis..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full border border-zinc-700/80 bg-zinc-950 px-4 py-2.5 pl-10 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-amber-500"
+              />
+            </div>
+
+            {/* Selects */}
+            <div className="flex flex-wrap sm:flex-nowrap gap-3">
+              <select
+                value={genre}
+                onChange={(e) => setGenre(e.target.value)}
+                className="border border-zinc-700/80 bg-zinc-950 px-4 py-2.5 text-sm text-zinc-200 outline-none transition-colors focus:border-amber-500 cursor-pointer"
+              >
+                <option value="">All Genres</option>
+                {GENRES.map((g) => (
+                  <option key={g} value={g.toLowerCase()}>
+                    {g}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={availability}
+                onChange={(e) => setAvailability(e.target.value)}
+                className="border border-zinc-700/80 bg-zinc-950 px-4 py-2.5 text-sm text-zinc-200 outline-none transition-colors focus:border-amber-500 cursor-pointer"
+              >
+                <option value="">All Tiers</option>
+                <option value="free">Free to Read (No Paywall)</option>
+                <option value="in_stock">Available Now</option>
+                <option value="sold">Sold Out</option>
+              </select>
+
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value)}
+                className="border border-zinc-700/80 bg-zinc-950 px-4 py-2.5 text-sm text-zinc-200 outline-none transition-colors focus:border-amber-500 cursor-pointer"
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-          <select
-            value={genre}
-            onChange={(e) => setGenre(e.target.value)}
-            className="rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary bg-white dark:bg-slate-900 text-dark dark:text-white"
-          >
-            <option value="">All Genres</option>
-            {GENRES.map((g) => (
-              <option key={g} value={g.toLowerCase()}>{g}</option>
-            ))}
-          </select>
-          <select
-            value={availability}
-            onChange={(e) => setAvailability(e.target.value)}
-            className="rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary bg-white dark:bg-slate-900 text-dark dark:text-white"
-          >
-            <option value="">All Availability</option>
-            <option value="in_stock">In Stock</option>
-            <option value="sold">Sold</option>
-          </select>
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            className="rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary bg-white dark:bg-slate-900 text-dark dark:text-white"
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
+
+          {/* Secondary Filter Row: Price & Reset */}
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-zinc-800 text-xs">
+            <div className="flex items-center gap-3">
+              <span className="font-mono uppercase tracking-wider text-zinc-400">Price Range:</span>
+              <input
+                type="number"
+                placeholder="Min $"
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                className="w-20 border border-zinc-700 bg-zinc-950 px-2.5 py-1.5 text-xs text-white placeholder-zinc-500 outline-none focus:border-amber-500"
+                min="0"
+              />
+              <span className="text-zinc-600">—</span>
+              <input
+                type="number"
+                placeholder="Max $"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                className="w-20 border border-zinc-700 bg-zinc-950 px-2.5 py-1.5 text-xs text-white placeholder-zinc-500 outline-none focus:border-amber-500"
+                min="0"
+              />
+            </div>
+
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="flex items-center gap-1.5 text-xs text-amber-500 hover:text-amber-400 transition-colors cursor-pointer"
+              >
+                <X className="h-3.5 w-3.5" />
+                <span>Reset All Filters</span>
+              </button>
+            )}
+          </div>
         </div>
-        <div className="mt-3 flex items-center gap-4">
-          <span className="text-sm font-medium text-gray-500 dark:text-slate-400">Price:</span>
-          <input
-            type="number"
-            placeholder="Min"
-            value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
-            className="w-24 rounded-lg border border-gray-300 dark:border-slate-800 px-3 py-1.5 text-sm outline-none focus:border-primary bg-white dark:bg-slate-900 text-dark dark:text-white"
-            min="0"
-          />
-          <span className="text-gray-400 dark:text-slate-500">–</span>
-          <input
-            type="number"
-            placeholder="Max"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
-            className="w-24 rounded-lg border border-gray-300 dark:border-slate-800 px-3 py-1.5 text-sm outline-none focus:border-primary bg-white dark:bg-slate-900 text-dark dark:text-white"
-            min="0"
-          />
-          {(search || genre || minPrice || maxPrice || availability || sort !== "newest") && (
+
+        {/* Results Counter */}
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+            {loading ? "Searching catalog..." : `${pagination.total} Titles Available`}
+          </p>
+        </div>
+
+        {/* Ebook Grid */}
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+          {loading
+            ? Array.from({ length: 8 }).map((_, i) => <EbookCardSkeleton key={i} />)
+            : ebooks.map((ebook, i) => (
+                <EbookCard key={ebook._id} ebook={ebook} index={i} />
+              ))}
+        </div>
+
+        {/* Empty State */}
+        {!loading && ebooks.length === 0 && (
+          <div className="border border-zinc-700/30 bg-zinc-900/40 py-24 text-center px-6">
+            <div className="flex h-16 w-16 mx-auto items-center justify-center border border-zinc-700 bg-zinc-800 text-zinc-500 mb-4">
+              <BookOpen className="h-8 w-8 stroke-[1.2]" />
+            </div>
+            <h3 className="text-lg font-medium text-white">No Ebooks Match Your Criteria</h3>
+            <p className="mt-2 text-sm text-zinc-400 max-w-sm mx-auto">
+              We couldn&apos;t find any stories matching your search or filters. Try adjusting price limits or clearing genres.
+            </p>
             <button
-              onClick={() => { setSearch(""); setGenre(""); setMinPrice(""); setMaxPrice(""); setAvailability(""); setSort("newest"); }}
-              className="ml-auto text-sm text-primary dark:text-purple-400 hover:underline"
+              onClick={clearFilters}
+              className="mt-6 bg-white px-6 py-2.5 text-xs font-medium text-zinc-950 hover:bg-zinc-200 transition-all cursor-pointer"
             >
-              Clear filters
+              Clear Filters
             </button>
-          )}
-        </div>
-      </div>
+          </div>
+        )}
 
-      {/* Results count */}
-      {!loading && (
-        <p className="mb-4 text-sm text-gray-500 dark:text-slate-400">
-          {pagination.total} ebook{pagination.total !== 1 ? "s" : ""} found
-        </p>
-      )}
-
-      {/* Ebook Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-        {loading
-          ? Array.from({ length: 8 }).map((_, i) => <EbookCardSkeleton key={i} />)
-          : ebooks.map((ebook, i) => (
-              <EbookCard key={ebook._id} ebook={ebook} index={i} />
-            ))}
-      </div>
-
-      {/* Empty state */}
-      {!loading && ebooks.length === 0 && (
-        <div className="py-20 text-center">
-          <svg className="mx-auto mb-4 h-16 w-16 text-gray-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-          </svg>
-          <h3 className="text-lg font-semibold text-dark dark:text-white">No ebooks found</h3>
-          <p className="mt-1 text-gray-500 dark:text-slate-400">Try adjusting your search or filters.</p>
-        </div>
-      )}
-
-      {/* Pagination */}
-      {pagination.pages > 1 && (
-        <div className="mt-10 flex items-center justify-center gap-2">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page <= 1}
-            className="rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 text-sm font-medium transition hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40"
-          >
-            Previous
-          </button>
-          {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((p) => (
+        {/* Technical Pagination */}
+        {pagination.pages > 1 && (
+          <div className="mt-16 flex items-center justify-center gap-2">
             <button
-              key={p}
-              onClick={() => setPage(p)}
-              className={`h-10 w-10 rounded-lg text-sm font-medium transition ${
-                p === page
-                  ? "bg-primary text-white shadow-md"
-                  : "border border-gray-300 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800"
-              }`}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="flex h-10 items-center gap-1 border border-zinc-700 bg-zinc-900/60 px-4 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
             >
-              {p}
+              <ChevronLeft className="h-4 w-4" />
+              <span>Previous</span>
             </button>
-          ))}
-          <button
-            onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
-            disabled={page >= pagination.pages}
-            className="rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 text-sm font-medium transition hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 disabled:opacity-40"
-          >
-            Next
-          </button>
-        </div>
-      )}
+
+            {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPage(p)}
+                className={cn(
+                  "flex h-10 w-10 items-center justify-center border text-xs font-mono transition-colors cursor-pointer",
+                  p === page
+                    ? "border-amber-500 bg-amber-500 text-zinc-950 font-bold"
+                    : "border-zinc-700 bg-zinc-900/60 text-zinc-300 hover:bg-zinc-800"
+                )}
+              >
+                {p}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
+              disabled={page >= pagination.pages}
+              className="flex h-10 items-center gap-1 border border-zinc-700 bg-zinc-900/60 px-4 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+            >
+              <span>Next</span>
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
 export default function BrowsePage() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex min-h-[60vh] items-center justify-center bg-zinc-950">
+          <LoadingSpinner size="lg" />
+        </div>
+      }
+    >
       <BrowseContent />
     </Suspense>
   );

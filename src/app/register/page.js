@@ -4,9 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "react-toastify";
+import { ArrowRight, UserPlus, CheckCircle2 } from "lucide-react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { authService } from "@/services";
 import { ROLES } from "@/constants";
+import { SectionBadge } from "@/components/ui/SectionHeader";
+import { cn } from "@/lib/utils";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -40,7 +43,7 @@ export default function RegisterPage() {
         password: form.password,
         role: form.role,
       });
-      toast.success("Account created successfully! Please login.");
+      toast.success("Account registered successfully! Please log in.");
       router.push("/login");
     } catch (err) {
       toast.error(err.response?.data?.error || "Registration failed");
@@ -50,77 +53,123 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-[70vh] items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-950 p-5 sm:p-8 shadow-lg border dark:border-slate-800">
-        <h1 className="mb-6 text-center text-3xl font-bold text-dark dark:text-white">Register</h1>
+    <div className="relative flex min-h-[85vh] w-full items-center justify-center px-4 py-16 bg-zinc-950 text-white overflow-hidden">
+      {/* Background Hero Texture */}
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-10 pointer-events-none"
+        style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+      />
+
+      <div className="relative z-10 w-full max-w-md border border-zinc-700/50 bg-zinc-900/90 p-8 sm:p-10 backdrop-blur-xl shadow-2xl">
+        {/* Header */}
+        <div className="mb-6 flex flex-col items-center text-center space-y-3">
+          <SectionBadge>Registration Gateway</SectionBadge>
+          <h1 className="text-3xl font-normal tracking-tight text-white">Create an Account</h1>
+          <p className="text-xs text-zinc-400">
+            Join the decentralized community of readers and independent authors.
+          </p>
+        </div>
+
+        {/* Role Switcher */}
+        <div className="mb-6 flex border border-zinc-700/60 bg-zinc-950 p-1">
+          <button
+            type="button"
+            onClick={() => setForm({ ...form, role: ROLES.USER })}
+            className={cn(
+              "flex-1 py-2 text-center text-xs font-mono uppercase tracking-wider transition-all cursor-pointer",
+              form.role === ROLES.USER
+                ? "bg-zinc-800 text-white font-bold border border-zinc-700"
+                : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            Reader
+          </button>
+          <button
+            type="button"
+            onClick={() => setForm({ ...form, role: ROLES.WRITER })}
+            className={cn(
+              "flex-1 py-2 text-center text-xs font-mono uppercase tracking-wider transition-all cursor-pointer",
+              form.role === ROLES.WRITER
+                ? "bg-zinc-800 text-white font-bold border border-zinc-700"
+                : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            Writer / Author
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Full Name</label>
+            <label className="mb-2 block text-xs font-mono uppercase tracking-wider text-zinc-400">
+              Full Legal Name
+            </label>
             <input
               type="text"
               required
               value={form.fullName}
               onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white dark:bg-slate-900 text-dark dark:text-slate-100"
+              placeholder="Alex Rivera"
+              className="w-full border border-zinc-700/80 bg-zinc-950 px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition-colors focus:border-amber-500"
             />
           </div>
+
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Email</label>
+            <label className="mb-2 block text-xs font-mono uppercase tracking-wider text-zinc-400">
+              Email Address
+            </label>
             <input
               type="email"
               required
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white dark:bg-slate-900 text-dark dark:text-slate-100"
+              placeholder="alex@example.com"
+              className="w-full border border-zinc-700/80 bg-zinc-950 px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition-colors focus:border-amber-500"
             />
           </div>
+
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Password</label>
+            <label className="mb-2 block text-xs font-mono uppercase tracking-wider text-zinc-400">
+              Password (Min 6 Characters)
+            </label>
             <input
               type="password"
               required
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white dark:bg-slate-900 text-dark dark:text-slate-100"
+              placeholder="••••••••••••"
+              className="w-full border border-zinc-700/80 bg-zinc-950 px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition-colors focus:border-amber-500"
             />
           </div>
+
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Confirm Password</label>
+            <label className="mb-2 block text-xs font-mono uppercase tracking-wider text-zinc-400">
+              Confirm Password
+            </label>
             <input
               type="password"
               required
               value={form.confirmPassword}
               onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white dark:bg-slate-900 text-dark dark:text-slate-100"
+              placeholder="••••••••••••"
+              className="w-full border border-zinc-700/80 bg-zinc-950 px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition-colors focus:border-amber-500"
             />
           </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Role</label>
-            <select
-              value={form.role}
-              onChange={(e) => setForm({ ...form, role: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-2 outline-none focus:border-primary bg-white dark:bg-slate-900 text-dark dark:text-slate-100"
-            >
-              <option value={ROLES.USER}>Reader</option>
-              <option value={ROLES.WRITER}>Writer</option>
-            </select>
-          </div>
+
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 font-semibold text-white transition hover:bg-secondary disabled:opacity-50"
+            className="w-full bg-white py-3 text-sm font-medium text-zinc-950 transition-all hover:bg-zinc-200 active:scale-95 disabled:opacity-50 cursor-pointer shadow-md mt-4"
           >
-            {loading ? <LoadingSpinner size="sm" /> : "Register"}
+            {loading ? <LoadingSpinner size="sm" /> : "Complete Registration"}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-600 dark:text-slate-400">
-          Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-primary dark:text-purple-400 hover:underline">
-            Login
+        <div className="mt-8 border-t border-zinc-800/80 pt-6 text-center text-xs text-zinc-400">
+          Already have an existing profile?{" "}
+          <Link href="/login" className="font-medium text-amber-500 hover:text-amber-400">
+            Log In &rarr;
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   );

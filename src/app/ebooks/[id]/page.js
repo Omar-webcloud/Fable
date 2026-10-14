@@ -4,11 +4,16 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
-import { ebookService, paymentService, bookmarkService } from "@/services";
+import { Heart, BookOpen, CheckCircle2, ShieldCheck, ArrowLeft, Gift, Sparkles, ChevronDown } from "lucide-react";
+import Link from "next/link";
+import { ebookService, paymentService } from "@/services";
 import { useAuth } from "@/providers/AuthProvider";
 import { formatPrice, formatDate } from "@/utils";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useWishlist } from "@/providers/WishlistProvider";
+import { SectionBadge, BlurHeading } from "@/components/ui/SectionHeader";
+import { FormattedReader } from "@/components/ui/FormattedReader";
+import { cn } from "@/lib/utils";
 
 export default function EbookDetailsPage() {
   const { id } = useParams();
@@ -19,13 +24,15 @@ export default function EbookDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
   const [purchased, setPurchased] = useState(false);
+  const [isReadingFree, setIsReadingFree] = useState(false);
   const { isWishlisted, toggleWishlist } = useWishlist();
   const bookmarked = isWishlisted(id);
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    ebookService.getById(id)
+    ebookService
+      .getById(id)
       .then((res) => {
         setEbook(res.data);
         if (user?.purchasedBooks) {
@@ -42,11 +49,9 @@ export default function EbookDetailsPage() {
       .finally(() => setLoading(false));
   }, [id, user]);
 
-  // Bookmarks are synced globally via useWishlist hook
-
   const handlePurchase = async () => {
     if (!user) {
-      toast.info("Please login to purchase");
+      toast.info("Please log in to purchase this ebook");
       router.push("/login");
       return;
     }
@@ -58,10 +63,20 @@ export default function EbookDetailsPage() {
         window.location.href = url;
       }
     } catch (err) {
-      toast.error(err.response?.data?.error || "Purchase failed");
+      toast.error(err.response?.data?.error || "Purchase initialization failed");
     } finally {
       setPurchasing(false);
     }
+  };
+
+  const handleReadFree = () => {
+    setIsReadingFree(true);
+    setTimeout(() => {
+      const readerElem = document.getElementById("reader-content");
+      if (readerElem) {
+        readerElem.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
   };
 
   const toggleBookmark = () => {
@@ -70,16 +85,18 @@ export default function EbookDetailsPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-5xl px-4 py-12">
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className="animate-pulse rounded-xl bg-gray-200 dark:bg-slate-800" style={{ height: 400 }} />
-          <div className="space-y-4">
-            <div className="h-8 w-3/4 animate-pulse rounded bg-gray-200 dark:bg-slate-800" />
-            <div className="h-5 w-1/2 animate-pulse rounded bg-gray-200 dark:bg-slate-800" />
-            <div className="h-4 w-full animate-pulse rounded bg-gray-200 dark:bg-slate-800" />
-            <div className="h-4 w-full animate-pulse rounded bg-gray-200 dark:bg-slate-800" />
-            <div className="h-4 w-2/3 animate-pulse rounded bg-gray-200 dark:bg-slate-800" />
-            <div className="h-10 w-40 animate-pulse rounded bg-gray-200 dark:bg-slate-800" />
+      <div className="w-full bg-zinc-950 min-h-screen py-20 px-6 md:px-12">
+        <div className="mx-auto max-w-5xl">
+          <div className="grid gap-12 md:grid-cols-2">
+            <div className="h-[500px] border border-zinc-800 bg-zinc-900/60 animate-pulse" />
+            <div className="space-y-6">
+              <div className="h-8 w-1/3 bg-zinc-800 animate-pulse" />
+              <div className="h-12 w-3/4 bg-zinc-800 animate-pulse" />
+              <div className="h-4 w-full bg-zinc-800 animate-pulse" />
+              <div className="h-4 w-2/3 bg-zinc-800 animate-pulse" />
+              <div className="h-28 bg-zinc-800 animate-pulse" />
+              <div className="h-12 w-48 bg-zinc-800 animate-pulse" />
+            </div>
           </div>
         </div>
       </div>
@@ -88,127 +105,264 @@ export default function EbookDetailsPage() {
 
   if (!ebook) {
     return (
-      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 p-8 text-center">
-        <svg className="h-20 w-20 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-        </svg>
-        <h2 className="text-2xl font-bold text-dark dark:text-white">Ebook Not Found</h2>
-        <p className="text-gray-500 dark:text-slate-450">The ebook you&apos;re looking for doesn&apos;t exist.</p>
-        <button onClick={() => router.push("/browse")} className="rounded-lg bg-primary px-6 py-2 text-white hover:bg-secondary">
-          Browse Ebooks
+      <div className="w-full bg-zinc-950 min-h-screen flex flex-col items-center justify-center p-8 text-center text-white">
+        <div className="flex h-20 w-20 items-center justify-center border border-zinc-700 bg-zinc-900 text-zinc-500 mb-6">
+          <BookOpen className="h-10 w-10 stroke-[1.2]" />
+        </div>
+        <h2 className="text-2xl font-normal text-white">Ebook Not Found</h2>
+        <p className="mt-2 text-sm text-zinc-400 max-w-sm">
+          The publication you are trying to view might have been moved or removed by the author.
+        </p>
+        <button
+          onClick={() => router.push("/browse")}
+          className="mt-6 bg-white px-6 py-2.5 text-xs font-medium text-zinc-950 hover:bg-zinc-200 transition-colors"
+        >
+          Return to Library
         </button>
       </div>
     );
   }
 
   const isOwner = user && ebook.writerId === user._id;
+  const isFree = Boolean(ebook.isFree || Number(ebook.price) === 0);
+  const canRead = isFree || purchased || isOwner || isReadingFree;
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="grid gap-8 md:grid-cols-2"
-      >
-        {/* Cover Image */}
-        <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-purple-50 to-violet-100 shadow-lg">
-          {ebook.coverImage ? (
-            <img src={ebook.coverImage} alt={ebook.title} className="h-full w-full object-cover" style={{ minHeight: 400 }} />
-          ) : (
-            <div className="flex items-center justify-center" style={{ minHeight: 400 }}>
-              <svg className="h-32 w-32 text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-              </svg>
-            </div>
-          )}
-        </div>
-
-        {/* Details */}
-        <div>
-          <div className="mb-2 flex items-center gap-3">
-            <span className="rounded-full bg-purple-50 dark:bg-purple-950/40 px-3 py-1 text-sm font-medium text-primary dark:text-purple-300">{ebook.genre}</span>
-            <span className={`rounded-full px-3 py-1 text-sm font-medium ${ebook.status === "published" ? "bg-green-50 text-green-600 dark:bg-green-950/30 dark:text-green-400" : "bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400"}`}>
-              {ebook.status === "published" ? "Available" : "Unpublished"}
-            </span>
-          </div>
-
-          <h1 className="mb-2 text-3xl font-bold text-dark dark:text-white">{ebook.title}</h1>
-          <p className="mb-4 text-gray-500 dark:text-slate-400">
-            by <span className="font-medium text-secondary">{ebook.writerName}</span>
-          </p>
-
-          <p className="mb-6 text-gray-600 dark:text-slate-300 leading-relaxed">{ebook.description}</p>
-
-          <div className="mb-6 rounded-xl bg-gray-50 dark:bg-slate-950/50 border dark:border-slate-800/80 p-4">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-gray-500 dark:text-slate-400">Price</span>
-                <p className="text-2xl font-bold text-primary dark:text-purple-400">{formatPrice(ebook.price)}</p>
-              </div>
-              <div>
-                <span className="text-gray-500 dark:text-slate-400">Uploaded</span>
-                <p className="font-medium text-dark dark:text-slate-200">{formatDate(ebook.createdAt)}</p>
-              </div>
-              <div>
-                <span className="text-gray-500 dark:text-slate-400">Total Sales</span>
-                <p className="font-medium text-dark dark:text-slate-200">{ebook.totalSales || 0}</p>
-              </div>
-              <div>
-                <span className="text-gray-500 dark:text-slate-400">Genre</span>
-                <p className="font-medium text-dark dark:text-slate-200">{ebook.genre}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-3">
-            {purchased ? (
-              <div className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-green-50 dark:bg-green-950/30 px-6 py-3 font-semibold text-green-600 dark:text-green-400">
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/>
-                </svg>
-                Already Purchased
-              </div>
-            ) : isOwner ? (
-              <div className="flex-1 rounded-xl bg-gray-100 dark:bg-slate-800 px-6 py-3 text-center font-semibold text-gray-400 dark:text-slate-500">
-                Your own ebook
-              </div>
-            ) : (
-              <button
-                onClick={handlePurchase}
-                disabled={purchasing}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-white transition hover:bg-secondary disabled:opacity-50"
-              >
-                {purchasing ? <LoadingSpinner size="sm" /> : "Buy Now"}
-              </button>
-            )}
-
-            <button
-              onClick={toggleBookmark}
-              className={`rounded-xl border-2 px-4 py-3 transition ${bookmarked ? "border-primary bg-primary/5 text-primary" : "border-gray-200 dark:border-slate-800 text-gray-400 hover:border-primary hover:text-primary dark:hover:border-primary dark:hover:text-primary"}`}
-              aria-label="Toggle Wishlist"
-            >
-              <svg className="h-5 w-5" fill={bookmarked ? "#EF4444" : "none"} stroke={bookmarked ? "#EF4444" : "currentColor"} strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Full Content (visible after purchase) */}
-      {purchased && ebook.fullContent && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mt-12 rounded-2xl bg-white dark:bg-slate-950 p-8 shadow-lg border dark:border-slate-800"
+    <div className="w-full bg-zinc-950 text-white min-h-screen py-16 px-6 md:px-12 lg:px-16">
+      <div className="mx-auto max-w-6xl">
+        {/* Back Link */}
+        <Link
+          href="/browse"
+          className="inline-flex items-center gap-2 text-xs font-medium text-zinc-400 hover:text-white transition-colors mb-10"
         >
-          <h2 className="mb-4 text-2xl font-bold text-dark dark:text-white">Full Content</h2>
-          <div className="prose max-w-none text-gray-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
-            {ebook.fullContent}
+          <ArrowLeft className="h-3.5 w-3.5" />
+          <span>Back to Library</span>
+        </Link>
+
+        {/* 2-Column Product Detail Layout */}
+        <div className="grid gap-12 lg:grid-cols-12 items-start">
+          {/* Left Column: Cover Image & Framing */}
+          <div className="lg:col-span-5">
+            <div className="relative border border-zinc-700/40 bg-zinc-900/60 p-2 shadow-2xl">
+              <div className="relative aspect-[3/4] w-full overflow-hidden bg-zinc-950 border border-zinc-800">
+                {ebook.coverImage ? (
+                  <img
+                    src={ebook.coverImage}
+                    alt={ebook.title}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full flex-col items-center justify-center bg-zinc-950 p-8 text-zinc-600">
+                    <BookOpen className="h-16 w-16 text-zinc-700 stroke-[1.2] mb-3" />
+                    <span className="text-xs uppercase tracking-widest font-mono text-zinc-500">
+                      Original Edition
+                    </span>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent pointer-events-none" />
+
+                {/* Free Ebook Banner over cover */}
+                {isFree && (
+                  <div className="absolute top-3 left-3 flex items-center gap-1.5 border border-emerald-500/50 bg-emerald-950/80 px-3 py-1 text-xs font-mono uppercase tracking-wider text-emerald-400 backdrop-blur-md">
+                    <Gift className="h-3.5 w-3.5" />
+                    <span>Free Ebook</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Verified Original watermark */}
+              <div className="flex items-center justify-between p-3 text-[11px] font-mono uppercase tracking-wider text-zinc-500 border-t border-zinc-800/80 mt-2">
+                <span>Format: Digital EPUB / Text</span>
+                <span className={cn(isFree ? "text-emerald-400 font-bold" : "text-amber-500")}>
+                  {isFree ? "Free Open Access" : "Direct Author Support"}
+                </span>
+              </div>
+            </div>
           </div>
-        </motion.div>
-      )}
+
+          {/* Right Column: Title, Specs & Action Buttons */}
+          <div className="lg:col-span-7 space-y-8">
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <SectionBadge>{ebook.genre || "Literary Fiction"}</SectionBadge>
+                {isFree ? (
+                  <div className="flex items-center gap-1.5 border border-emerald-500/50 bg-emerald-950/40 px-3 py-1 text-xs text-emerald-400 font-mono">
+                    <span className="h-1.5 w-1.5 bg-emerald-400" />
+                    <span>Free Online Reading</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs text-zinc-300 font-mono">
+                    <div className={cn("h-1.5 w-1.5", ebook.status === "published" ? "bg-green-500" : "bg-zinc-500")} />
+                    <span>{ebook.status === "published" ? "Live on Fable" : "Draft"}</span>
+                  </div>
+                )}
+              </div>
+
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-normal tracking-tight text-white leading-tight">
+                {ebook.title}
+              </h1>
+
+              <p className="text-sm text-zinc-400">
+                Authored by{" "}
+                <span className="text-white font-medium hover:text-amber-400 transition-colors">
+                  {ebook.writerName || "Independent Writer"}
+                </span>
+              </p>
+            </div>
+
+            {/* Synopsis */}
+            <p className="text-zinc-300 leading-relaxed text-base font-normal">
+              {ebook.description}
+            </p>
+
+            {/* Technical Specifications Panel */}
+            <div className="border border-zinc-700/40 bg-zinc-900/60 p-6 space-y-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                <div>
+                  <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">Price</div>
+                  <div
+                    className={cn(
+                      "text-2xl font-mono font-medium mt-1",
+                      isFree ? "text-emerald-400 font-bold" : "text-amber-500"
+                    )}
+                  >
+                    {isFree ? "FREE" : formatPrice(ebook.price)}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">Published</div>
+                  <div className="text-sm font-mono text-zinc-200 mt-1.5">
+                    {formatDate(ebook.createdAt)}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">Total Readers</div>
+                  <div className="text-sm font-mono text-zinc-200 mt-1.5">
+                    {ebook.totalSales || 0} readers
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">Access Mode</div>
+                  <div className="text-sm font-mono text-zinc-200 mt-1.5 flex items-center gap-1">
+                    {isFree ? (
+                      <>
+                        <Gift className="h-3.5 w-3.5 text-emerald-400" />
+                        <span className="text-emerald-400">Open Access</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck className="h-3.5 w-3.5 text-amber-500" />
+                        <span>Stripe Protected</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+              {isFree ? (
+                /* FREE EBOOK: Direct Read without pay gateway */
+                <button
+                  onClick={handleReadFree}
+                  className="flex-1 flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-semibold px-8 py-3.5 transition-all active:scale-95 cursor-pointer shadow-lg shadow-emerald-500/20"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  <span>Read Free Now &mdash; Instant Access</span>
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+              ) : purchased ? (
+                <div className="flex-1 flex items-center justify-between gap-4 border border-green-500/40 bg-green-950/40 px-6 py-3.5 text-sm font-medium text-green-400">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span>Purchased &amp; In Library</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      document.getElementById("reader-content")?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="text-xs font-mono uppercase underline text-white hover:text-green-300"
+                  >
+                    Open Reader &darr;
+                  </button>
+                </div>
+              ) : isOwner ? (
+                <div className="flex-1 border border-zinc-700 bg-zinc-900/80 px-6 py-3.5 text-center text-sm font-medium text-zinc-400">
+                  You are the creator of this ebook
+                </div>
+              ) : (
+                <button
+                  onClick={handlePurchase}
+                  disabled={purchasing}
+                  className="flex-1 flex items-center justify-center gap-2 bg-white px-8 py-3.5 text-sm font-medium text-zinc-950 transition-all hover:bg-zinc-200 active:scale-95 disabled:opacity-50 cursor-pointer shadow-lg"
+                >
+                  {purchasing ? (
+                    <>
+                      <LoadingSpinner size="sm" />
+                      <span>Redirecting to Checkout...</span>
+                    </>
+                  ) : (
+                    <span>Buy &amp; Read Now &mdash; {formatPrice(ebook.price)}</span>
+                  )}
+                </button>
+              )}
+
+              {/* Wishlist toggle */}
+              <button
+                onClick={toggleBookmark}
+                className={cn(
+                  "flex h-12 items-center justify-center gap-2 border px-6 text-sm font-medium transition-all duration-200 cursor-pointer",
+                  bookmarked
+                    ? "border-red-500/60 bg-red-950/60 text-red-400"
+                    : "border-zinc-700 bg-zinc-900/60 text-zinc-300 hover:border-zinc-500 hover:text-white"
+                )}
+                aria-label="Toggle Wishlist"
+              >
+                <Heart className={cn("h-4 w-4", bookmarked && "fill-red-500 text-red-500")} />
+                <span>{bookmarked ? "In Wishlist" : "Save to Wishlist"}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Full Reader Section (Unlocked for Free Books, Purchases, or Creator) */}
+        {canRead && ebook.fullContent && (
+          <motion.div
+            id="reader-content"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-20 border border-zinc-700/40 bg-zinc-900/90 p-8 sm:p-12 md:p-16 shadow-2xl space-y-8"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-zinc-800">
+              <div className="space-y-1">
+                <SectionBadge>
+                  {isFree ? "Free Open Reader" : "Full Edition Reader"}
+                </SectionBadge>
+                <h2 className="text-2xl font-normal text-white">{ebook.title}</h2>
+              </div>
+              <div className="flex items-center gap-3 text-xs font-mono text-zinc-400">
+                {isFree ? (
+                  <span className="text-emerald-400 font-bold">Free Unrestricted Reading</span>
+                ) : (
+                  <span className="text-amber-500">Verified Purchased Copy</span>
+                )}
+                <span>•</span>
+                <span>Complete Text</span>
+              </div>
+            </div>
+
+            {/* Beautiful formatted reader using FormattedReader component */}
+            <div className="max-w-none text-zinc-200 pt-4">
+              <FormattedReader content={ebook.fullContent} />
+            </div>
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 }

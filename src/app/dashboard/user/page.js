@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { useAuth } from "@/providers/AuthProvider";
 import { purchaseService } from "@/services";
@@ -11,12 +10,15 @@ import { EbookCardSkeleton } from "@/components/SkeletonLoader";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { formatPrice, formatDate, getInitials } from "@/utils";
 import { useWishlist } from "@/providers/WishlistProvider";
+import { SectionBadge } from "@/components/ui/SectionHeader";
+import { ShoppingBag, BookOpen, Heart, User, ChevronDown, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const tabs = [
-  { key: "overview", label: "Overview" },
-  { key: "purchases", label: "Purchase History" },
-  { key: "ebooks", label: "Purchased Ebooks" },
-  { key: "bookmarks", label: "Wishlist" },
+  { key: "overview", label: "Overview", icon: User },
+  { key: "purchases", label: "Purchase History", icon: ShoppingBag },
+  { key: "ebooks", label: "Purchased Ebooks", icon: BookOpen },
+  { key: "bookmarks", label: "Wishlist", icon: Heart },
 ];
 
 function UserDashboardContent() {
@@ -26,11 +28,11 @@ function UserDashboardContent() {
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "overview");
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Keep state in sync with URL search params (desktop sidebar clicks)
   useEffect(() => {
     const tab = searchParams.get("tab") || "overview";
     setActiveTab(tab);
   }, [searchParams]);
+
   const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
   const { wishlist, loading: loadingWishlist } = useWishlist();
@@ -44,7 +46,8 @@ function UserDashboardContent() {
   useEffect(() => {
     if (!user) return;
     setLoading(true);
-    purchaseService.getByUser()
+    purchaseService
+      .getByUser()
       .then((res) => {
         setPurchases(res.data || []);
       })
@@ -52,26 +55,35 @@ function UserDashboardContent() {
       .finally(() => setLoading(false));
   }, [user]);
 
-  return (
-    <div>
-      <h1 className="mb-6 text-2xl font-bold text-dark dark:text-white">User Dashboard</h1>
+  const totalSpent = purchases.reduce((sum, p) => sum + (p.amount || 0), 0);
 
-      {/* Tab Navigation (mobile) */}
-      <div className="relative mb-6 lg:hidden">
+  return (
+    <div className="space-y-8">
+      {/* Title & Badge */}
+      <div className="space-y-2">
+        <SectionBadge>Reader Dashboard</SectionBadge>
+        <h1 className="text-3xl font-normal tracking-tight text-white">Reader Account Overview</h1>
+        <p className="text-xs text-zinc-400">
+          Manage your personal library, review payment history, and browse bookmarked titles.
+        </p>
+      </div>
+
+      {/* Mobile Tab Navigation */}
+      <div className="relative lg:hidden">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="flex w-full items-center justify-between rounded-lg border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-slate-200 shadow-sm focus:outline-none"
+          className="flex w-full items-center justify-between border border-zinc-700 bg-zinc-900 px-4 py-3 text-xs font-mono uppercase tracking-wider text-white"
         >
           <span>{tabs.find((t) => t.key === activeTab)?.label || "Menu"}</span>
-          <svg className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${menuOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+          <ChevronDown
+            className={`h-4 w-4 text-zinc-400 transition-transform ${menuOpen ? "rotate-180" : ""}`}
+          />
         </button>
 
         {menuOpen && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-            <div className="absolute left-0 right-0 z-20 mt-1 rounded-lg border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-1 shadow-lg">
+            <div className="absolute left-0 right-0 z-20 mt-1 border border-zinc-700 bg-zinc-900 shadow-2xl">
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
@@ -80,11 +92,12 @@ function UserDashboardContent() {
                     router.push(`?tab=${tab.key}`, { scroll: false });
                     setMenuOpen(false);
                   }}
-                  className={`flex w-full items-center px-4 py-2.5 text-sm font-medium transition ${
+                  className={cn(
+                    "flex w-full items-center px-4 py-3 text-xs font-mono uppercase tracking-wider transition-colors",
                     activeTab === tab.key
-                      ? "bg-primary/10 text-primary dark:bg-primary/20 dark:text-purple-400"
-                      : "text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-900"
-                  }`}
+                      ? "bg-zinc-800 text-amber-500 font-bold"
+                      : "text-zinc-400 hover:bg-zinc-800/60 hover:text-white"
+                  )}
                 >
                   {tab.label}
                 </button>
@@ -96,60 +109,104 @@ function UserDashboardContent() {
 
       {/* Overview Tab */}
       {activeTab === "overview" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          {/* Profile Card */}
-          <div className="mb-6 rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 shadow-sm p-6">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+          {/* Identity Bar */}
+          <div className="border border-zinc-700/40 bg-zinc-900/60 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-xl font-bold text-white">
-                {user?.image ? <img src={user.image} alt="" className="h-full w-full rounded-full object-cover" /> : getInitials(user?.name)}
+              <div className="flex h-12 w-12 items-center justify-center bg-amber-500 text-zinc-950 font-bold text-lg">
+                {user?.image ? (
+                  <img src={user.image} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  getInitials(user?.name)
+                )}
               </div>
               <div>
-                <h2 className="text-xl font-bold text-dark dark:text-white">{user?.name}</h2>
-                <p className="text-gray-500 dark:text-slate-400">{user?.email}</p>
-                <span className="mt-1 inline-block rounded-full bg-purple-50 dark:bg-purple-950/40 px-3 py-0.5 text-xs font-medium text-primary dark:text-purple-300 capitalize">{user?.role}</span>
+                <h2 className="text-lg font-medium text-white">{user?.name}</h2>
+                <p className="text-xs text-zinc-400 font-mono">{user?.email}</p>
               </div>
             </div>
-          </div>
 
-          {/* Stats Cards */}
-          <div className="mb-6 grid gap-4 sm:grid-cols-3">
-            <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-5 shadow-sm">
-              <p className="text-sm text-gray-500 dark:text-slate-400">Total Purchases</p>
-              <p className="mt-1 text-3xl font-bold text-primary dark:text-purple-400">{purchases.length}</p>
-            </div>
-            <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-5 shadow-sm">
-              <p className="text-sm text-gray-500 dark:text-slate-400">Amount Spent</p>
-              <p className="mt-1 text-3xl font-bold text-secondary dark:text-purple-300">
-                {formatPrice(purchases.reduce((sum, p) => sum + (p.amount || 0), 0))}
-              </p>
-            </div>
-            <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-5 shadow-sm">
-              <p className="text-sm text-gray-500 dark:text-slate-400">Wishlist</p>
-              <p className="mt-1 text-3xl font-bold text-accent dark:text-amber-400">{wishlist.length}</p>
+            <div className="border border-zinc-700 bg-zinc-950 px-3 py-1 text-xs font-mono uppercase tracking-wider text-amber-500 self-start sm:self-auto">
+              Role: {user?.role || "Reader"}
             </div>
           </div>
 
-          {/* Recent Purchases */}
-          <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-6 shadow-sm">
-            <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Recent Purchases</h3>
+          {/* Metric Cards */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="border border-zinc-700/40 bg-zinc-900/60 p-6 space-y-2">
+              <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                Purchased Books
+              </div>
+              <div className="text-3xl font-mono font-medium text-white">
+                {purchases.length}
+              </div>
+              <div className="text-[11px] text-zinc-500">Instant cloud reading access</div>
+            </div>
+
+            <div className="border border-zinc-700/40 bg-zinc-900/60 p-6 space-y-2">
+              <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                Total Contributed
+              </div>
+              <div className="text-3xl font-mono font-medium text-amber-500">
+                {formatPrice(totalSpent)}
+              </div>
+              <div className="text-[11px] text-zinc-500">Direct author revenue support</div>
+            </div>
+
+            <div className="border border-zinc-700/40 bg-zinc-900/60 p-6 space-y-2">
+              <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                Wishlist Bookmarks
+              </div>
+              <div className="text-3xl font-mono font-medium text-zinc-200">
+                {wishlist.length}
+              </div>
+              <div className="text-[11px] text-zinc-500">Saved for future reading</div>
+            </div>
+          </div>
+
+          {/* Recent Purchases List */}
+          <div className="border border-zinc-700/40 bg-zinc-900/60 p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+              <h3 className="text-sm font-medium uppercase tracking-wider font-mono text-zinc-300">
+                Recent Library Acquisitions
+              </h3>
+              <button
+                onClick={() => setActiveTab("purchases")}
+                className="text-xs text-amber-500 hover:text-amber-400 font-mono cursor-pointer"
+              >
+                View Full History &rarr;
+              </button>
+            </div>
+
             {loading ? (
               <div className="space-y-3">
-                {[1, 2, 3].map((i) => <div key={i} className="h-12 animate-pulse rounded bg-gray-100 dark:bg-slate-800" />)}
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-12 bg-zinc-800/60 animate-pulse" />
+                ))}
               </div>
             ) : purchases.length > 0 ? (
               <div className="space-y-3">
                 {purchases.slice(0, 5).map((p) => (
-                  <div key={p._id} className="flex items-center justify-between rounded-lg bg-gray-50 dark:bg-slate-900 border dark:border-slate-800 p-3">
+                  <div
+                    key={p._id}
+                    className="flex items-center justify-between border border-zinc-800 bg-zinc-950 p-4"
+                  >
                     <div>
-                      <p className="font-medium text-dark dark:text-white">{p.ebookId?.title || "Ebook"}</p>
-                      <p className="text-sm text-gray-500 dark:text-slate-400">{formatDate(p.purchaseDate)}</p>
+                      <p className="font-medium text-sm text-white">{p.ebookId?.title || "Original Manuscript"}</p>
+                      <p className="text-xs text-zinc-400 font-mono mt-0.5">{formatDate(p.purchaseDate)}</p>
                     </div>
-                    <span className="font-semibold text-primary dark:text-purple-400">{formatPrice(p.amount)}</span>
+                    <div className="text-right">
+                      <span className="font-mono text-sm font-medium text-amber-500">
+                        {formatPrice(p.amount)}
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-400 dark:text-slate-500">No purchases yet.</p>
+              <p className="py-8 text-center text-xs font-mono text-zinc-500">
+                No acquisitions yet. Browse the library to discover original works.
+              </p>
             )}
           </div>
         </motion.div>
@@ -157,63 +214,56 @@ function UserDashboardContent() {
 
       {/* Purchase History Tab */}
       {activeTab === "purchases" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          {/* Card list for Mobile */}
-          <div className="space-y-4 sm:hidden">
-            {loading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="animate-pulse rounded-xl border dark:border-slate-800 bg-white dark:bg-slate-950 p-4 space-y-3">
-                  <div className="h-5 w-2/3 rounded bg-gray-100 dark:bg-slate-800" />
-                  <div className="h-4 w-1/2 rounded bg-gray-100 dark:bg-slate-800" />
-                  <div className="h-4 w-1/3 rounded bg-gray-100 dark:bg-slate-800" />
-                </div>
-              ))
-            ) : purchases.length > 0 ? (
-              purchases.map((p) => (
-                <div key={p._id} className="rounded-xl border dark:border-slate-800 bg-white dark:bg-slate-950 p-4 shadow-sm space-y-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <h4 className="font-semibold text-dark dark:text-slate-200">{p.ebookId?.title || "Ebook"}</h4>
-                    <span className="font-bold text-primary dark:text-purple-400 shrink-0">{formatPrice(p.amount)}</span>
-                  </div>
-                  <div className="flex flex-col text-xs text-gray-500 dark:text-slate-400 space-y-1">
-                    <p><span className="font-medium text-gray-400">Writer:</span> {p.ebookId?.writerName || "—"}</p>
-                    <p><span className="font-medium text-gray-400">Date:</span> {formatDate(p.purchaseDate)}</p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="rounded-xl border dark:border-slate-800 bg-white dark:bg-slate-950 p-6 text-center text-gray-400">No purchases yet</div>
-            )}
-          </div>
-
-          {/* Desktop Table View */}
-          <div className="hidden sm:block rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 shadow-sm overflow-hidden">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          <div className="border border-zinc-700/40 bg-zinc-900/60 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b dark:border-slate-800 bg-gray-50 dark:bg-slate-900/50">
+              <table className="w-full text-left text-xs font-mono">
+                <thead className="border-b border-zinc-700/50 bg-zinc-950 text-zinc-400">
                   <tr>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Ebook</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Writer</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Price</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600 dark:text-slate-300">Date</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Ebook Title</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Author</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Amount</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider">Acquisition Date</th>
+                    <th className="px-5 py-3.5 uppercase tracking-wider text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y dark:divide-slate-800">
+                <tbody className="divide-y divide-zinc-800/80">
                   {loading ? (
-                    Array.from({ length: 5 }).map((_, i) => (
-                      <tr key={i}><td colSpan={4} className="px-4 py-3"><div className="h-5 animate-pulse rounded bg-gray-100 dark:bg-slate-800" /></td></tr>
+                    Array.from({ length: 4 }).map((_, i) => (
+                      <tr key={i}>
+                        <td colSpan={5} className="px-5 py-4">
+                          <div className="h-4 bg-zinc-800/60 animate-pulse" />
+                        </td>
+                      </tr>
                     ))
                   ) : purchases.length > 0 ? (
                     purchases.map((p) => (
-                      <tr key={p._id} className="hover:bg-gray-50 dark:hover:bg-slate-800/30">
-                        <td className="px-4 py-3 font-medium text-dark dark:text-slate-200">{p.ebookId?.title || "—"}</td>
-                        <td className="px-4 py-3 text-gray-500 dark:text-slate-400">{p.ebookId?.writerName || "—"}</td>
-                        <td className="px-4 py-3 font-semibold text-primary dark:text-purple-400">{formatPrice(p.amount)}</td>
-                        <td className="px-4 py-3 text-gray-500 dark:text-slate-400">{formatDate(p.purchaseDate)}</td>
+                      <tr key={p._id} className="hover:bg-zinc-800/30 transition-colors">
+                        <td className="px-5 py-4 font-sans font-medium text-white text-sm">
+                          {p.ebookId?.title || "—"}
+                        </td>
+                        <td className="px-5 py-4 text-zinc-400">{p.ebookId?.writerName || "—"}</td>
+                        <td className="px-5 py-4 text-amber-500 font-bold">{formatPrice(p.amount)}</td>
+                        <td className="px-5 py-4 text-zinc-400">{formatDate(p.purchaseDate)}</td>
+                        <td className="px-5 py-4 text-right">
+                          {p.ebookId?._id && (
+                            <Link
+                              href={`/ebooks/${p.ebookId._id}`}
+                              className="inline-flex items-center gap-1 text-white hover:text-amber-400 transition-colors"
+                            >
+                              <span>Read</span>
+                              <ArrowRight className="h-3 w-3" />
+                            </Link>
+                          )}
+                        </td>
                       </tr>
                     ))
                   ) : (
-                    <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-400 dark:text-slate-550">No purchases yet</td></tr>
+                    <tr>
+                      <td colSpan={5} className="px-5 py-12 text-center text-zinc-500">
+                        No purchase records located in this account.
+                      </td>
+                    </tr>
                   )}
                 </tbody>
               </table>
@@ -226,13 +276,17 @@ function UserDashboardContent() {
       {activeTab === "ebooks" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {loading
-              ? Array.from({ length: 6 }).map((_, i) => <EbookCardSkeleton key={i} />)
-              : purchases.length > 0
-                ? purchases.filter((p) => p.ebookId).map((p, i) => (
-                    <EbookCard key={p._id} ebook={p.ebookId} index={i} purchased />
-                  ))
-                : <p className="col-span-full py-12 text-center text-gray-400">No purchased ebooks</p>}
+            {loading ? (
+              Array.from({ length: 6 }).map((_, i) => <EbookCardSkeleton key={i} />)
+            ) : purchases.length > 0 ? (
+              purchases
+                .filter((p) => p.ebookId)
+                .map((p, i) => <EbookCard key={p._id} ebook={p.ebookId} index={i} purchased />)
+            ) : (
+              <div className="col-span-full border border-zinc-800 bg-zinc-900/40 p-12 text-center text-zinc-500 font-mono text-xs">
+                No purchased titles in library.
+              </div>
+            )}
           </div>
         </motion.div>
       )}
@@ -241,14 +295,18 @@ function UserDashboardContent() {
       {activeTab === "bookmarks" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {loadingWishlist
-              ? Array.from({ length: 6 }).map((_, i) => <EbookCardSkeleton key={i} />)
-              : wishlist.length > 0
-                ? wishlist.map((item, i) => {
-                    const ebook = item.ebookId || item;
-                    return <EbookCard key={item._id || ebook._id} ebook={ebook} index={i} />;
-                  })
-                : <p className="col-span-full py-12 text-center text-gray-400 dark:text-slate-500">No items in wishlist yet</p>}
+            {loadingWishlist ? (
+              Array.from({ length: 6 }).map((_, i) => <EbookCardSkeleton key={i} />)
+            ) : wishlist.length > 0 ? (
+              wishlist.map((item, i) => {
+                const ebook = item.ebookId || item;
+                return <EbookCard key={item._id || ebook._id} ebook={ebook} index={i} />;
+              })
+            ) : (
+              <div className="col-span-full border border-zinc-800 bg-zinc-900/40 p-12 text-center text-zinc-500 font-mono text-xs">
+                No bookmarked items in your wishlist.
+              </div>
+            )}
           </div>
         </motion.div>
       )}
@@ -258,11 +316,13 @@ function UserDashboardContent() {
 
 export default function UserDashboard() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex min-h-[60vh] items-center justify-center bg-zinc-950">
+          <LoadingSpinner size="lg" />
+        </div>
+      }
+    >
       <UserDashboardContent />
     </Suspense>
   );

@@ -1,3 +1,6 @@
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
 export function formatPrice(amount) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -13,8 +16,8 @@ export function formatDate(date) {
   }).format(new Date(date));
 }
 
-export function cn(...classes) {
-  return classes.filter(Boolean).join(" ");
+export function cn(...inputs) {
+  return twMerge(clsx(inputs));
 }
 
 export function getInitials(name) {

@@ -4,10 +4,13 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
+import { CheckCircle2, AlertCircle, BookOpen, ArrowRight, ShieldCheck } from "lucide-react";
 import { paymentService } from "@/services";
 import { useAuth } from "@/providers/AuthProvider";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { SectionBadge } from "@/components/ui/SectionHeader";
 import Link from "next/link";
+import { formatPrice } from "@/utils";
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -24,95 +27,125 @@ function PaymentSuccessContent() {
       return;
     }
 
-    paymentService.verifyPayment(sessionId)
+    paymentService
+      .verifyPayment(sessionId)
       .then((res) => {
         setPurchase(res.data);
         setStatus("success");
         refreshUser();
-        toast.success("Purchase completed!");
+        toast.success("Purchase verified & added to your library!");
       })
       .catch(() => {
         setStatus("error");
-        toast.error("Could not verify payment");
+        toast.error("Could not verify payment session");
       });
   }, [sessionId, refreshUser]);
 
   if (status === "loading") {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
         <LoadingSpinner size="lg" />
-        <p className="text-gray-500">Verifying your payment...</p>
+        <p className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+          Confirming Stripe cryptographic verification...
+        </p>
       </div>
     );
   }
 
   if (status === "error") {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-red-100">
-          <svg className="h-10 w-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
-          </svg>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 p-8 text-center text-white">
+        <div className="flex h-16 w-16 items-center justify-center border border-red-500/40 bg-red-950/40 text-red-400">
+          <AlertCircle className="h-8 w-8" />
         </div>
-        <h2 className="text-2xl font-bold text-dark dark:text-white">Payment Verification Failed</h2>
-        <p className="text-gray-500 dark:text-slate-400">We couldn&apos;t verify your payment. Please contact support.</p>
-        <Link href="/browse" className="rounded-lg bg-primary px-6 py-3 text-white hover:bg-secondary">
-          Browse Ebooks
-        </Link>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-normal text-white">Payment Verification Failed</h2>
+          <p className="text-sm text-zinc-400 max-w-md">
+            We could not verify the Stripe transaction session. If you were charged, please contact Fable support with your transaction reference.
+          </p>
+        </div>
+        <div className="flex gap-4">
+          <Link
+            href="/browse"
+            className="bg-white px-6 py-2.5 text-xs font-medium text-zinc-950 hover:bg-zinc-200 transition-colors"
+          >
+            Browse Library
+          </Link>
+          <Link
+            href="/contact"
+            className="border border-zinc-700 bg-transparent px-6 py-2.5 text-xs font-medium text-white hover:bg-zinc-800 transition-colors"
+          >
+            Contact Support
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-[60vh] items-center justify-center px-4 py-12">
+    <div className="flex min-h-[70vh] items-center justify-center px-4 py-16 text-white">
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-8 text-center shadow-lg"
+        className="w-full max-w-lg border border-zinc-700/50 bg-zinc-900/90 p-8 sm:p-12 shadow-2xl backdrop-blur-xl space-y-8"
       >
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-          className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100"
-        >
-          <svg className="h-10 w-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/>
-          </svg>
-        </motion.div>
+        <div className="flex flex-col items-center text-center space-y-4">
+          <SectionBadge>Transaction Settlement</SectionBadge>
+          <div className="flex h-16 w-16 items-center justify-center border border-green-500/50 bg-green-950/50 text-green-400">
+            <CheckCircle2 className="h-8 w-8" />
+          </div>
+          <h1 className="text-3xl font-normal tracking-tight text-white">Purchase Confirmed</h1>
+          <p className="text-xs text-zinc-400 max-w-sm">
+            Your transaction has been validated and the full original manuscript is unlocked in your library.
+          </p>
+        </div>
 
-        <h1 className="mb-2 text-2xl font-bold text-dark dark:text-white">Purchase Successful!</h1>
-        <p className="mb-6 text-gray-500 dark:text-slate-400">
-          Thank you for your purchase. You can now access the full ebook content.
-        </p>
+        {/* Receipt Box */}
+        {purchase && (
+          <div className="border border-zinc-800 bg-zinc-950 p-5 space-y-3 font-mono text-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-zinc-800 text-zinc-500">
+              <span>RECEIPT SPECIFICATION</span>
+              <span className="text-amber-500">STRIPE SETTLED</span>
+            </div>
 
-        {purchase?.ebookId && (
-          <div className="mb-6 rounded-xl bg-gray-50 dark:bg-slate-900 border dark:border-slate-800 p-4 text-left">
-            <p className="text-sm text-gray-500 dark:text-slate-400">Ebook</p>
-            <p className="font-semibold text-dark dark:text-slate-100">{purchase.ebookId.title || "Your ebook"}</p>
+            <div className="flex justify-between text-zinc-300">
+              <span className="text-zinc-500">Publication:</span>
+              <span className="text-white font-medium truncate max-w-[220px]">
+                {purchase.ebookId?.title || "Original Publication"}
+              </span>
+            </div>
+
             {purchase.amount && (
-              <>
-                <p className="mt-2 text-sm text-gray-500 dark:text-slate-400">Amount</p>
-                <p className="font-semibold text-primary dark:text-purple-400">${purchase.amount}</p>
-              </>
+              <div className="flex justify-between text-zinc-300">
+                <span className="text-zinc-500">Amount Paid:</span>
+                <span className="text-amber-500 font-bold">${purchase.amount}</span>
+              </div>
             )}
+
+            <div className="flex justify-between text-zinc-300">
+              <span className="text-zinc-500">Delivery:</span>
+              <span>Instant Digital Access</span>
+            </div>
           </div>
         )}
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
           {purchase?.ebookId?._id && (
             <Link
               href={`/ebooks/${purchase.ebookId._id}`}
-              className="flex-1 rounded-lg bg-primary px-4 py-3 font-semibold text-white transition hover:bg-secondary"
+              className="flex-1 flex items-center justify-center gap-2 bg-white px-6 py-3 text-xs font-medium text-zinc-950 hover:bg-zinc-200 transition-all text-center shadow-md cursor-pointer"
             >
-              Read Ebook
+              <BookOpen className="h-4 w-4" />
+              <span>Read Ebook Now</span>
             </Link>
           )}
+
           <Link
             href="/dashboard/user"
-            className="flex-1 rounded-lg border border-gray-300 dark:border-slate-800 px-4 py-3 font-semibold text-dark dark:text-slate-200 transition hover:bg-gray-50 dark:hover:bg-slate-900"
+            className="flex-1 flex items-center justify-center gap-2 border border-zinc-700 bg-zinc-950 px-6 py-3 text-xs font-medium text-white hover:bg-zinc-800 transition-colors text-center cursor-pointer"
           >
-            My Purchases
+            <span>User Dashboard</span>
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
       </motion.div>
@@ -122,12 +155,13 @@ function PaymentSuccessContent() {
 
 export default function PaymentSuccessPage() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <LoadingSpinner size="lg" />
-        <p className="text-gray-500">Loading payment status...</p>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex min-h-[60vh] items-center justify-center bg-zinc-950">
+          <LoadingSpinner size="lg" />
+        </div>
+      }
+    >
       <PaymentSuccessContent />
     </Suspense>
   );

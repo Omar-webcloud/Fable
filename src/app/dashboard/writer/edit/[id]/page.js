@@ -2,11 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "react-toastify";
 import { ebookService } from "@/services";
 import { uploadToImgBB } from "@/lib/imgbb";
 import { GENRES } from "@/constants";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { SectionBadge } from "@/components/ui/SectionHeader";
+import { ManuscriptEditor } from "@/components/ui/ManuscriptEditor";
+import { ArrowLeft, BookOpen, Gift } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function EditEbookPage() {
   const { id } = useParams();
@@ -15,6 +20,7 @@ export default function EditEbookPage() {
   const [fetching, setFetching] = useState(true);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [isFree, setIsFree] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -26,20 +32,23 @@ export default function EditEbookPage() {
   });
 
   useEffect(() => {
-    ebookService.getById(id)
+    ebookService
+      .getById(id)
       .then((res) => {
         const ebook = res.data;
+        const free = ebook.isFree || Number(ebook.price) === 0;
+        setIsFree(free);
         setForm({
           title: ebook.title || "",
           description: ebook.description || "",
           fullContent: ebook.fullContent || "",
           genre: ebook.genre || GENRES[0],
-          price: String(ebook.price || ""),
+          price: free ? "0" : String(ebook.price || ""),
           coverImage: ebook.coverImage || "",
         });
         if (ebook.coverImage) setImagePreview(ebook.coverImage);
       })
-      .catch(() => toast.error("Failed to load ebook"))
+      .catch(() => toast.error("Failed to load publication data"))
       .finally(() => setFetching(false));
   }, [id]);
 
@@ -51,8 +60,27 @@ export default function EditEbookPage() {
     }
   };
 
+  const handleFreeToggle = (checked) => {
+    setIsFree(checked);
+    if (checked) {
+      setForm((prev) => ({ ...prev, price: "0" }));
+    } else {
+      setForm((prev) => ({ ...prev, price: "" }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.title || !form.description || !form.genre) {
+      toast.error("Please fill in title, genre, and synopsis");
+      return;
+    }
+
+    if (!isFree && (!form.price || Number(form.price) < 0)) {
+      toast.error("Please specify a valid price or toggle Free Ebook");
+      return;
+    }
+
     setLoading(true);
     try {
       let coverImage = form.coverImage;
@@ -61,7 +89,7 @@ export default function EditEbookPage() {
           const imgResult = await uploadToImgBB(imageFile);
           coverImage = imgResult.url;
         } catch {
-          toast.error("Image upload failed, keeping existing cover");
+          toast.error("Image upload failed, retaining current artwork");
         }
       }
 
@@ -70,14 +98,15 @@ export default function EditEbookPage() {
         description: form.description,
         fullContent: form.fullContent,
         genre: form.genre,
-        price: Number(form.price),
+        price: isFree ? 0 : Number(form.price),
+        isFree,
         coverImage,
       });
 
-      toast.success("Ebook updated!");
+      toast.success("Publication updated successfully!");
       router.push("/dashboard/writer?tab=ebooks");
     } catch (err) {
-      toast.error(err.response?.data?.error || "Failed to update ebook");
+      toast.error(err.response?.data?.error || "Failed to update publication");
     } finally {
       setLoading(false);
     }
@@ -87,78 +116,182 @@ export default function EditEbookPage() {
 
   if (fetching) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center">
+      <div className="flex min-h-[40vh] items-center justify-center bg-zinc-950 text-white">
         <LoadingSpinner size="lg" />
       </div>
     );
   }
 
   return (
-    <div>
-      <h1 className="mb-6 text-2xl font-bold text-dark dark:text-white">Edit Ebook</h1>
+    <div className="space-y-8 max-w-4xl">
+      {/* Header */}
+      <div className="space-y-3">
+        <Link
+          href="/dashboard/writer?tab=ebooks"
+          className="inline-flex items-center gap-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          <span>Back to Manage Ebooks</span>
+        </Link>
+        <SectionBadge>Publication Studio</SectionBadge>
+        <h1 className="text-3xl font-normal tracking-tight text-white">Edit Manuscript</h1>
+        <p className="text-xs text-zinc-400">
+          Modify title, genre, toggle free reader access or update text formatting with the editor.
+        </p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="mx-auto max-w-2xl space-y-6">
-        <div className="rounded-xl bg-white dark:bg-slate-950 border dark:border-slate-800 p-6 shadow-sm">
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="border border-zinc-700/40 bg-zinc-900/60 p-8 space-y-6">
           {/* Cover Image Upload */}
-          <div className="mb-6">
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">Cover Image</label>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="flex h-40 w-28 shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-300 dark:border-slate-800 bg-gray-50 dark:bg-slate-900">
+          <div>
+            <label className="mb-2 block text-xs font-mono uppercase tracking-wider text-zinc-400">
+              Cover Artwork
+            </label>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+              <div className="flex h-44 w-32 shrink-0 items-center justify-center overflow-hidden border border-dashed border-zinc-700 bg-zinc-950">
                 {imagePreview ? (
                   <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
                 ) : (
-                  <svg className="h-8 w-8 text-gray-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                  </svg>
+                  <div className="text-center p-3 text-zinc-600">
+                    <BookOpen className="h-8 w-8 mx-auto mb-1 stroke-[1.2]" />
+                    <span className="text-[10px] font-mono uppercase">No Artwork</span>
+                  </div>
                 )}
               </div>
-              <div className="flex-1">
-                <input type="file" accept="image/*" onChange={handleImageChange} className="text-sm text-gray-500 dark:text-slate-400 file:mr-3 file:rounded-lg file:border-0 file:bg-primary/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary hover:file:bg-primary/20" />
-                <p className="mt-2 text-xs text-gray-400 dark:text-slate-500">PNG, JPG up to 5MB. Uploaded to imgBB.</p>
+              <div className="flex-1 space-y-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="text-xs text-zinc-400 file:mr-4 file:border file:border-zinc-700 file:bg-zinc-800 file:px-4 file:py-2 file:text-xs file:font-mono file:text-white hover:file:bg-zinc-700 cursor-pointer"
+                />
+                <p className="text-[11px] text-zinc-500 font-mono">
+                  Select new image to replace current artwork.
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="mb-4">
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Title *</label>
-            <input type="text" required value={form.title} onChange={(e) => update("title", e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-dark dark:text-white px-4 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+          {/* Title */}
+          <div>
+            <label className="mb-2 block text-xs font-mono uppercase tracking-wider text-zinc-400">
+              Manuscript Title *
+            </label>
+            <input
+              type="text"
+              required
+              value={form.title}
+              onChange={(e) => update("title", e.target.value)}
+              className="w-full border border-zinc-700/80 bg-zinc-950 px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition-colors focus:border-amber-500"
+            />
           </div>
 
-          <div className="mb-4">
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Genre *</label>
-            <select value={form.genre} onChange={(e) => update("genre", e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-dark dark:text-white px-4 py-2 outline-none focus:border-primary">
-              {GENRES.map((g) => <option key={g} value={g}>{g}</option>)}
-            </select>
+          {/* Pricing Options & Free Book Toggle */}
+          <div className="border border-zinc-800 bg-zinc-950/70 p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <Gift className={cn("h-4 w-4", isFree ? "text-emerald-400" : "text-zinc-500")} />
+                <div>
+                  <span className="text-xs font-mono uppercase tracking-wider text-white font-medium">
+                    Free Ebook Access
+                  </span>
+                  <p className="text-[11px] text-zinc-400">
+                    Allow readers to read this manuscript completely free on the website without a payment gateway.
+                  </p>
+                </div>
+              </div>
+
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isFree}
+                  onChange={(e) => handleFreeToggle(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-zinc-800 peer-focus:outline-none rounded-none peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500" />
+              </label>
+            </div>
+
+            <div className="grid gap-6 sm:grid-cols-2 pt-2 border-t border-zinc-800/80">
+              <div>
+                <label className="mb-2 block text-xs font-mono uppercase tracking-wider text-zinc-400">
+                  Genre Category *
+                </label>
+                <select
+                  value={form.genre}
+                  onChange={(e) => update("genre", e.target.value)}
+                  className="w-full border border-zinc-700/80 bg-zinc-950 px-4 py-2.5 text-sm text-white outline-none transition-colors focus:border-amber-500 cursor-pointer"
+                >
+                  {GENRES.map((g) => (
+                    <option key={g} value={g}>
+                      {g}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-xs font-mono uppercase tracking-wider text-zinc-400">
+                  Unit Price (USD $) *
+                </label>
+                <input
+                  type="number"
+                  disabled={isFree}
+                  min="0"
+                  step="0.01"
+                  value={isFree ? "0" : form.price}
+                  onChange={(e) => update("price", e.target.value)}
+                  className={cn(
+                    "w-full border border-zinc-700/80 bg-zinc-950 px-4 py-2.5 text-sm outline-none transition-colors focus:border-amber-500",
+                    isFree ? "text-emerald-400 opacity-60 font-mono font-bold" : "text-white"
+                  )}
+                  placeholder={isFree ? "0.00 (Free for readers)" : "9.99"}
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="mb-4">
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Price (USD) *</label>
-            <input type="number" required min="0" step="0.01" value={form.price} onChange={(e) => update("price", e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-dark dark:text-white px-4 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+          {/* Description */}
+          <div>
+            <label className="mb-2 block text-xs font-mono uppercase tracking-wider text-zinc-400">
+              Synopsis &amp; Abstract *
+            </label>
+            <textarea
+              required
+              rows={4}
+              value={form.description}
+              onChange={(e) => update("description", e.target.value)}
+              className="w-full border border-zinc-700/80 bg-zinc-950 px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition-colors focus:border-amber-500"
+            />
           </div>
 
-          <div className="mb-4">
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Description *</label>
-            <textarea required rows={4} value={form.description} onChange={(e) => update("description", e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-dark dark:text-white px-4 py-2 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
-          </div>
-
-          <div className="mb-4">
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Full Content</label>
-            <textarea rows={10} value={form.fullContent} onChange={(e) => update("fullContent", e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-dark dark:text-white px-4 py-2 font-mono text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+          {/* Manuscript Text Editor */}
+          <div>
+            <label className="mb-2 block text-xs font-mono uppercase tracking-wider text-zinc-400">
+              Full Manuscript Text (Text Editor &amp; Reader Preview)
+            </label>
+            <ManuscriptEditor
+              value={form.fullContent}
+              onChange={(val) => update("fullContent", val)}
+              placeholder="Edit your manuscript chapters here..."
+            />
           </div>
         </div>
 
-        <div className="flex gap-3">
-          <button type="submit" disabled={loading}
-            className="flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-white transition hover:bg-secondary disabled:opacity-50">
-            {loading ? <LoadingSpinner size="sm" /> : "Update Ebook"}
+        {/* Action Buttons */}
+        <div className="flex items-center gap-4">
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-white px-8 py-3.5 text-sm font-medium text-zinc-950 hover:bg-zinc-200 transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-md"
+          >
+            {loading ? <LoadingSpinner size="sm" /> : "Save Changes"}
           </button>
-          <button type="button" onClick={() => router.back()}
-            className="rounded-lg border border-gray-300 dark:border-slate-800 px-6 py-3 font-semibold text-gray-600 dark:text-slate-350 transition hover:bg-gray-50 dark:hover:bg-slate-900">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="border border-zinc-700 bg-transparent px-6 py-3.5 text-sm font-medium text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+          >
             Cancel
           </button>
         </div>

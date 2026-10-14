@@ -2,122 +2,149 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { BookOpen, Sparkles, Feather, ShieldCheck, ArrowRight, Compass, Users, DollarSign } from "lucide-react";
+import { SectionBadge, BlurHeading } from "@/components/ui/SectionHeader";
+import { LogoCloud } from "@/components/ui/LogoCloud";
 
 export default function AboutPage() {
+  const pillars = [
+    {
+      title: "Our Mission",
+      description:
+        "To democratize digital publishing by connecting independent authors directly with readers worldwide, ensuring maximum creative control and 100% fair earnings.",
+      icon: <Compass className="w-5 h-5 text-zinc-950" />,
+      tag: "Vision 01",
+    },
+    {
+      title: "For Passionate Readers",
+      description:
+        "Discover genuine, untamed literature. Support creative voices directly, save stories to your lifelong cloud library, and enjoy high-readability digital typography.",
+      icon: <BookOpen className="w-5 h-5 text-zinc-950" />,
+      tag: "Audience 02",
+    },
+    {
+      title: "For Modern Writers",
+      description:
+        "Publish manuscripts with one click, retain your copyright, monitor live reader analytics, and receive automated payouts through global Stripe infrastructure.",
+      icon: <Feather className="w-5 h-5 text-zinc-950" />,
+      tag: "Creators 03",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-background dark:bg-dark transition-colors duration-200">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-dark py-20 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(109,40,217,0.15),transparent)]" />
-        <div className="relative mx-auto max-w-5xl px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <span className="inline-block rounded-full bg-primary/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-secondary">
-              Our Story
-            </span>
-            <h1 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
-              Empowering <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Writers</span>,
-              <br />
-              Inspiring <span className="text-accent">Readers</span>.
-            </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-300">
-              Fable is a next-generation digital ebook sharing and publishing platform. We bridge the gap between independent authors and passionate readers worldwide.
-            </p>
-          </motion.div>
+    <div className="w-full bg-zinc-950 text-white min-h-screen">
+      {/* 1. Hero Section matching Skydda hero */}
+      <section className="relative w-full overflow-hidden border-b border-zinc-700/30">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: "url('/images/hero-bg.jpg')",
+          }}
+        />
+        <div className="absolute inset-0 bg-zinc-950/75 backdrop-blur-[1px]" />
+
+        <div className="relative z-10 mx-auto max-w-5xl px-6 py-28 md:py-36 text-center flex flex-col items-center space-y-6">
+          <SectionBadge>Our Philosophy</SectionBadge>
+          <BlurHeading
+            text="Empowering Writers. Inspiring Readers."
+            className="text-4xl sm:text-6xl md:text-7xl font-normal"
+          />
+          <p className="max-w-2xl text-base sm:text-lg text-zinc-300 leading-relaxed">
+            Fable is a next-generation digital publishing ecosystem. We eliminate middlemen and static barriers to celebrate direct human storytelling.
+          </p>
         </div>
       </section>
 
-      {/* Pillars Section */}
-      <section className="mx-auto max-w-6xl px-4 py-20">
-        <div className="grid gap-8 md:grid-cols-3">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="rounded-2xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-950 p-8 shadow-sm transition hover:shadow-md"
-          >
-            <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <h3 className="mb-2 text-xl font-bold text-dark dark:text-white">Our Mission</h3>
-            <p className="text-gray-600 dark:text-slate-400">
-              To democratize publishing by giving authors direct access to their readers, ensuring they retain maximum control and earnings over their work.
-            </p>
-          </motion.div>
+      {/* 2. Pillars Section matching Skydda Features Grid */}
+      <section className="mx-auto max-w-7xl px-6 py-24 md:px-12 md:py-32 border-b border-zinc-700/30">
+        <div className="space-y-4 mb-16 text-center flex flex-col items-center">
+          <SectionBadge>Core Pillars</SectionBadge>
+          <BlurHeading
+            text="Built for the Next Generation of Literature"
+            className="text-3xl sm:text-4xl md:text-5xl font-normal"
+          />
+        </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="rounded-2xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-950 p-8 shadow-sm transition hover:shadow-md"
-          >
-            <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            </div>
-            <h3 className="mb-2 text-xl font-bold text-dark dark:text-white">For Readers</h3>
-            <p className="text-gray-600 dark:text-slate-400">
-              Discover unique voices, support independent writers, and enjoy a premium, seamless reading experience with books saved directly to your digital library.
-            </p>
-          </motion.div>
+        <div className="grid gap-6 md:grid-cols-3">
+          {pillars.map((pillar, i) => (
+            <motion.div
+              key={pillar.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="border border-zinc-700/30 bg-zinc-900/60 p-8 flex flex-col justify-between hover:border-amber-500/50 transition-colors duration-300"
+            >
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex h-10 w-10 items-center justify-center bg-amber-500">
+                    {pillar.icon}
+                  </div>
+                  <span className="font-mono text-xs uppercase tracking-wider text-zinc-500">
+                    {pillar.tag}
+                  </span>
+                </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="rounded-2xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-950 p-8 shadow-sm transition hover:shadow-md"
-          >
-            <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 text-accent">
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-            </div>
-            <h3 className="mb-2 text-xl font-bold text-dark dark:text-white">For Writers</h3>
-            <p className="text-gray-600 dark:text-slate-400">
-              Publish ebooks instantly, access sales analytics, track transactions, and get paid securely via Stripe with clear, robust dashboards.
-            </p>
-          </motion.div>
+                <h3 className="text-xl font-medium text-white tracking-tight">
+                  {pillar.title}
+                </h3>
+
+                <p className="text-zinc-400 text-sm leading-relaxed">
+                  {pillar.description}
+                </p>
+              </div>
+
+              <div className="pt-6 mt-6 border-t border-zinc-800 text-xs font-mono text-amber-500 flex items-center gap-1">
+                <span>Autonomous Publishing</span>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="bg-white dark:bg-dark py-16 transition-colors duration-200">
-        <div className="mx-auto max-w-4xl px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="rounded-3xl bg-gradient-to-br from-primary to-secondary p-10 text-white shadow-xl md:p-16"
-          >
-            <h2 className="text-3xl font-bold md:text-4xl">Ready to dive in?</h2>
-            <p className="mx-auto mt-4 max-w-lg text-purple-100">
-              Create an account today to publish your first ebook or browse thousands of stories waiting to be read.
+      {/* 3. Platform Trust Cloud */}
+      <section className="w-full bg-zinc-900 py-20 border-b border-zinc-700/30">
+        <div className="mx-auto max-w-7xl px-6 md:px-12 lg:px-16">
+          <LogoCloud title="Supported by Modern Publishing Standards" />
+        </div>
+      </section>
+
+      {/* 4. CTA Section */}
+      <section className="relative w-full overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: "url('/images/hero-bg.jpg')",
+          }}
+        >
+          <div className="absolute inset-0 bg-black/65" />
+        </div>
+
+        <div className="relative mx-auto max-w-7xl px-6 py-24 md:px-12 md:py-36">
+          <div className="max-w-2xl space-y-6">
+            <SectionBadge>Get Started Today</SectionBadge>
+            <BlurHeading
+              text="Ready to share your story with the world?"
+              className="text-4xl sm:text-5xl md:text-6xl font-normal"
+            />
+            <p className="text-zinc-300 text-base sm:text-lg leading-relaxed">
+              Create an account now to start publishing or explore thousands of original ebooks curated for discerning readers.
             </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link
                 href="/register"
-                className="rounded-xl bg-white px-6 py-3 font-semibold text-primary shadow-md transition hover:bg-gray-50 hover:shadow-lg"
+                className="bg-white px-8 py-3.5 text-sm font-medium text-zinc-950 transition-all hover:bg-zinc-200 active:scale-95 text-center shadow-lg"
               >
-                Join Fable
+                Join Fable Platform
               </Link>
               <Link
                 href="/browse"
-                className="rounded-xl border border-white/30 bg-white/10 px-6 py-3 font-semibold text-white transition hover:bg-white/20"
+                className="border border-white/30 bg-transparent px-8 py-3.5 text-sm font-medium text-white transition-all hover:bg-white/10 active:scale-95 text-center"
               >
-                Browse Books
+                Browse Catalog
               </Link>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>

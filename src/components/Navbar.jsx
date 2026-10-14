@@ -4,8 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/providers/AuthProvider";
-import { cn } from "@/utils";
+import { cn } from "@/lib/utils";
 import ThemeToggle from "./ThemeToggle";
+import { BookOpen, Menu, X, ArrowRight, User } from "lucide-react";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -19,96 +20,149 @@ export default function Navbar() {
 
   const links = [
     { href: "/", label: "Home" },
-    { href: "/browse", label: "Browse Ebooks" },
+    { href: "/browse", label: "Browse" },
+    { href: "/about", label: "About" },
+    { href: "/contact", label: "Contact" },
     { href: "/dashboard", label: "Dashboard" },
   ];
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-gray-100 dark:border-slate-900 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-        <Link href="/" className="flex items-center gap-2 transition-transform duration-300 hover:scale-105 active:scale-95">
-          <img src="/logo.png" alt="Fable Logo" className="h-9 w-auto object-contain dark:brightness-110" />
+    <nav className="sticky top-0 z-50 w-full border-b border-zinc-700/30 bg-zinc-900/90 backdrop-blur-md">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-12">
+        {/* Brand */}
+        <Link href="/" className="flex items-center gap-2 text-white group">
+          <div className="flex h-8 w-8 items-center justify-center border border-zinc-700 bg-zinc-800 text-amber-500 transition-colors group-hover:border-amber-500/50">
+            <BookOpen className="h-4 w-4" />
+          </div>
+          <span className="text-lg font-medium tracking-tight text-white">Fable</span>
         </Link>
 
-        <div className="hidden items-center gap-6 md:flex">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "relative font-medium transition-colors duration-300 hover:text-primary dark:hover:text-primary after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full",
-                pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))
-                  ? "text-primary after:w-full"
-                  : "text-gray-700 dark:text-slate-300"
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
-          <ThemeToggle />
-          {user ? (
-            <button
-              onClick={handleLogout}
-              className="rounded-lg bg-primary px-4 py-2 text-white shadow-sm transition-all duration-300 hover:bg-secondary hover:shadow-md hover:-translate-y-0.5 active:scale-95"
-            >
-              Logout
-            </button>
-          ) : (
-            <Link
-              href="/login"
-              className={cn(
-                "rounded-lg bg-primary px-4 py-2 text-white shadow-sm transition-all duration-300 hover:bg-secondary hover:shadow-md hover:-translate-y-0.5 active:scale-95",
-                pathname === "/login" && "ring-2 ring-primary/30 shadow-none hover:shadow-none hover:translate-y-0"
-              )}
-            >
-              Login
-            </Link>
-          )}
+        {/* Desktop Links */}
+        <div className="hidden items-center gap-8 text-sm text-zinc-300 md:flex">
+          {links.map((link) => {
+            const isActive =
+              pathname === link.href ||
+              (link.href !== "/" && pathname.startsWith(link.href));
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "relative py-1 text-sm font-medium transition-colors hover:text-white",
+                  isActive
+                    ? "text-white after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-amber-500"
+                    : "text-zinc-400"
+                )}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
 
-        <button
-          className="md:hidden text-gray-700 dark:text-slate-200 transition-transform active:scale-95"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
-        >
-          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {mobileOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
-      </div>
+        {/* Right CTA / Auth & Theme */}
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
 
-      {mobileOpen && (
-        <div className="border-t border-gray-100 dark:border-slate-900 bg-white dark:bg-slate-950 px-4 py-4 md:hidden animate-in slide-in-from-top-2 fade-in duration-200">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "block py-2 font-medium",
-                pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))
-                  ? "text-primary"
-                  : "text-gray-700 dark:text-slate-300"
-              )}
-              onClick={() => setMobileOpen(false)}
-            >
-              {link.label}
-            </Link>
-          ))}
-          <div className="mt-4 flex items-center justify-between border-t border-gray-100 dark:border-slate-900 pt-4">
-            {user ? (
-              <button onClick={handleLogout} className="font-medium text-primary hover:text-secondary">
+          {user ? (
+            <div className="hidden items-center gap-3 md:flex">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 border border-zinc-700/60 bg-zinc-800/80 px-3 py-1.5 text-xs font-medium text-zinc-200 hover:border-zinc-500 transition-colors"
+              >
+                <User className="h-3.5 w-3.5 text-amber-500" />
+                <span className="max-w-[120px] truncate">{user.name || "Account"}</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="border border-zinc-700/60 bg-transparent px-4 py-1.5 text-xs font-medium text-zinc-300 transition-all hover:bg-white hover:text-zinc-950 active:scale-95 cursor-pointer"
+              >
                 Logout
               </button>
-            ) : (
-              <Link href="/login" className="font-medium text-primary hover:text-secondary" onClick={() => setMobileOpen(false)}>
-                Login
+            </div>
+          ) : (
+            <div className="hidden items-center gap-3 md:flex">
+              <Link
+                href="/login"
+                className="text-xs font-medium text-zinc-300 hover:text-white transition-colors"
+              >
+                Log in
               </Link>
-            )}
-            <ThemeToggle />
+              <Link
+                href="/register"
+                className="flex items-center gap-1.5 bg-white px-4 py-1.5 text-xs font-medium text-zinc-950 hover:bg-zinc-200 transition-all active:scale-95"
+              >
+                <span>Get Started</span>
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+          )}
+
+          {/* Mobile hamburger button */}
+          <button
+            className="text-zinc-300 hover:text-white md:hidden cursor-pointer"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Drawer */}
+      {mobileOpen && (
+        <div className="border-t border-zinc-700/30 bg-zinc-900/95 px-6 py-6 backdrop-blur-md md:hidden">
+          <div className="flex flex-col gap-4">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "py-2 text-sm font-medium transition-colors hover:text-white",
+                  pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href))
+                    ? "text-amber-500 font-semibold"
+                    : "text-zinc-400"
+                )}
+                onClick={() => setMobileOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+
+            <div className="mt-4 border-t border-zinc-700/30 pt-4 flex flex-col gap-3">
+              {user ? (
+                <>
+                  <div className="flex items-center gap-2 text-xs text-zinc-400">
+                    <User className="h-3.5 w-3.5 text-amber-500" />
+                    <span>Signed in as {user.name}</span>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full border border-zinc-700 bg-transparent py-2.5 text-xs font-medium text-white hover:bg-zinc-800"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="w-full border border-zinc-700 bg-transparent py-2 text-center text-xs font-medium text-white hover:bg-zinc-800"
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setMobileOpen(false)}
+                    className="w-full bg-white py-2 text-center text-xs font-medium text-zinc-950 hover:bg-zinc-200"
+                  >
+                    Get Started
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
