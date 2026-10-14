@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/providers/AuthProvider";
 import { cn } from "@/lib/utils";
-import ThemeToggle from "./ThemeToggle";
 import { BookOpen, Menu, X, ArrowRight, User } from "lucide-react";
 
 export default function Navbar() {
@@ -61,10 +60,8 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* Right CTA / Auth & Theme */}
+        {/* Right CTA / Auth */}
         <div className="flex items-center gap-4">
-          <ThemeToggle />
-
           {user ? (
             <div className="hidden items-center gap-3 md:flex">
               <Link
