@@ -320,7 +320,7 @@ export default function HomePage() {
                     )}
                   >
                     <div className="space-y-4">
-                      <div className="text-amber-500 font-mono text-3xl font-light">"</div>
+                      <div className="text-amber-500 font-mono text-3xl font-light">&ldquo;</div>
                       <p className="text-zinc-300 text-sm leading-relaxed min-h-[70px]">
                         {writer.bio || "Fable gives me complete creative autonomy and sends payments straight to my account. No middleman, no bureaucracy."}
                       </p>

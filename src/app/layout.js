@@ -16,7 +16,7 @@ export const metadata = {
   title: "Fable — Discover & Read Original Ebooks",
   description: "Next-generation digital ebook sharing and publishing platform. Discover, purchase, and read original ebooks.",
   icons: {
-    icon: "/logo.png",
+    icon: "/favicon.svg",
   },
 };
 
